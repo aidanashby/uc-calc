@@ -98,6 +98,11 @@ function uc_calc_setting_row( $label, $group, $key, $value, $hint = '' ) {
 			uc_calc_setting_row( __( 'Child element (monthly)', 'uc-calc' ),          'rates', 'childElement',           $s['rates']['childElement'],           __( 'Added per dependent child.', 'uc-calc' ) );
 			uc_calc_setting_row( __( 'Work allowance — no housing (monthly)', 'uc-calc' ), 'rates', 'workAllowanceNoHousing', $s['rates']['workAllowanceNoHousing'], __( 'Applies to households with children.', 'uc-calc' ) );
 			uc_calc_setting_row( __( 'Taper rate (decimal)', 'uc-calc' ),             'rates', 'taperRate',              $s['rates']['taperRate'],              __( 'E.g. 0.55 = 55p in every £1 earned reduces UC.', 'uc-calc' ) );
+			uc_calc_setting_row( __( 'Benefit cap: couple or single parent (monthly)', 'uc-calc' ), 'rates', 'benefitCapFamily',            $s['rates']['benefitCapFamily'],            __( 'Outside London.', 'uc-calc' ) );
+			uc_calc_setting_row( __( 'Benefit cap: single, no children (monthly)', 'uc-calc' ),     'rates', 'benefitCapSingle',            $s['rates']['benefitCapSingle'],            __( 'Outside London.', 'uc-calc' ) );
+			uc_calc_setting_row( __( 'Benefit cap earnings threshold (monthly)', 'uc-calc' ),       'rates', 'benefitCapEarningsThreshold', $s['rates']['benefitCapEarningsThreshold'], __( 'Households taking home at least this much from work are exempt from the cap.', 'uc-calc' ) );
+			uc_calc_setting_row( __( 'Child Benefit: eldest child (weekly)', 'uc-calc' ),           'rates', 'childBenefitEldest',          $s['rates']['childBenefitEldest'],          __( 'Not counted as income. Used only to work out the benefit cap.', 'uc-calc' ) );
+			uc_calc_setting_row( __( 'Child Benefit: each other child (weekly)', 'uc-calc' ),       'rates', 'childBenefitAdditional',      $s['rates']['childBenefitAdditional'],      __( 'Not counted as income. Used only to work out the benefit cap.', 'uc-calc' ) );
 			?>
 		</table>
 

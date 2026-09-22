@@ -1,7 +1,7 @@
 'use strict';
 
 const { UC_RATES: defaultRates, COSTS: defaultCosts } = require('./data');
-const { calculateUCIncome }                          = require('./calculator');
+const { calculateUC }                                = require('./calculator');
 const { calculateBasketCosts }                       = require('./basket');
 const { getResultState, formatCurrency, COPY }       = require('./result');
 
@@ -31,6 +31,7 @@ const DEFAULT_I18N = {
   childAge5to15:      '5 to 15',
   basketAriaIncluded: '%1$s, %2$s per week',
   basketAriaExcluded: '%1$s, %2$s per week, excluded',
+  benefitCapNote:     'The benefit cap has lowered the UC shown here. The cap doesn’t apply if your household takes home at least %s a month from work, or if someone gets certain disability or carer benefits.',
   states:             COPY,
 };
 
@@ -322,6 +323,16 @@ function renderChildAges(s) {
   }
 }
 
+function updateBenefitCapNote(capped) {
+  const noteEl = document.getElementById('uc-calc-cap-note');
+  if (!noteEl) return;
+  noteEl.hidden = !capped;
+  if (capped && UC_RATES.benefitCap) {
+    const template = I18N.benefitCapNote || DEFAULT_I18N.benefitCapNote;
+    noteEl.textContent = format(template, formatCurrency(UC_RATES.benefitCap.earningsThreshold));
+  }
+}
+
 function updateResultPanel(income, essentialsTotal, result) {
   const incomeEl      = document.getElementById('uc-calc-income');
   const essentialsEl  = document.getElementById('uc-calc-essentials');
@@ -348,7 +359,8 @@ function updateResultPanel(income, essentialsTotal, result) {
 }
 
 function render(s) {
-  const income = calculateUCIncome(s, UC_RATES);
+  const uc     = calculateUC(s, UC_RATES);
+  const income = uc.weekly;
   const costs  = calculateBasketCosts(s, COSTS);
   const result = getResultState(income, costs.total);
 
@@ -357,6 +369,7 @@ function render(s) {
   renderChildAges(s);
   updateBasketRows(s, costs);
   updateResultPanel(income, costs.total, result);
+  updateBenefitCapNote(uc.capped);
 }
 
 // ─── Sync DOM → State (used on reset) ────────────────────────────────────────

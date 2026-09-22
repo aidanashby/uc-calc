@@ -420,6 +420,18 @@
   color: inherit;
 }
 
+.uc-calc__result-cap-note {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0.75rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid #ececec;
+}
+
+.uc-calc__result-cap-note[hidden] {
+  display: none;
+}
+
 /* ─── Footer ────────────────────────────────────────────────────────────────── */
 
 .uc-calc__footer {

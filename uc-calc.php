@@ -50,8 +50,13 @@ function uc_calc_defaults() {
 			'coupleBothUnder25'      => 528.34,
 			'coupleAny25Plus'        => 666.97,
 			'childElement'           => 303.94,
-			'workAllowanceNoHousing' => 673.00,
-			'taperRate'              => 0.55,
+			'workAllowanceNoHousing'      => 710.00,
+			'taperRate'                   => 0.55,
+			'benefitCapFamily'            => 1835.00,
+			'benefitCapSingle'            => 1229.42,
+			'benefitCapEarningsThreshold' => 881.00,
+			'childBenefitEldest'          => 27.05,
+			'childBenefitAdditional'      => 17.90,
 		],
 		'costs' => [
 			'food_firstAdult'        => 35,
@@ -129,6 +134,15 @@ function uc_calc_build_js_data( $settings ) {
 			'childElement'           => (float) $r['childElement'],
 			'workAllowanceNoHousing' => (float) $r['workAllowanceNoHousing'],
 			'taperRate'              => (float) $r['taperRate'],
+			'benefitCap'             => [
+				'family'            => (float) $r['benefitCapFamily'],
+				'single'            => (float) $r['benefitCapSingle'],
+				'earningsThreshold' => (float) $r['benefitCapEarningsThreshold'],
+			],
+			'childBenefit'           => [
+				'eldest'     => (float) $r['childBenefitEldest'],
+				'additional' => (float) $r['childBenefitAdditional'],
+			],
 		],
 		'costs' => [
 			'food' => [
@@ -228,6 +242,8 @@ function uc_calc_i18n_strings() {
 		'childAge5to15'      => __( '5 to 15', 'uc-calc' ),
 		'basketAriaIncluded' => __( '%1$s, %2$s per week', 'uc-calc' ),
 		'basketAriaExcluded' => __( '%1$s, %2$s per week, excluded', 'uc-calc' ),
+		/* translators: %s: monthly earnings threshold, e.g. £881.00. */
+		'benefitCapNote'     => __( 'The benefit cap has lowered the UC shown here. The cap doesn’t apply if your household takes home at least %s a month from work, or if someone gets certain disability or carer benefits.', 'uc-calc' ),
 		'states' => [
 			'shortfall' => [
 				'label'   => __( 'Shortfall', 'uc-calc' ),

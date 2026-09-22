@@ -1,6 +1,6 @@
 'use strict';
 
-const { calculateUCIncome } = require('../src/calculator');
+const { calculateUC, calculateUCIncome } = require('../src/calculator');
 const { UC_RATES } = require('../src/data');
 
 function round2(n) {
@@ -67,15 +67,26 @@ test('scenario 9: single 25+, working £1,200/month — no work allowance (no ch
 // Work allowance — only when household has children
 
 test('work allowance applies when household has children', () => {
-  // Single 25+, 1 child, working £673/month (exactly at work allowance)
-  // excess = 673 - 673 = 0. No reduction.
-  const monthly = UC_RATES.standardAllowance.single25Plus + UC_RATES.childElement + 673;
+  // Single 25+, 1 child, working exactly at the work allowance: no reduction.
+  const wa = UC_RATES.workAllowanceNoHousing;
+  const monthly = UC_RATES.standardAllowance.single25Plus + UC_RATES.childElement + wa;
   expect(round2(calculateUCIncome(singleState({
     numChildren: 1,
     childAges: ['5to15'],
     adult1Working: true,
-    adult1MonthlyEarnings: 673,
+    adult1MonthlyEarnings: wa,
   }), UC_RATES))).toBe(round2(monthly * 12 / 52));
+});
+
+test('scenario 9b: single parent 25+, 1 child, working £1,200/month', () => {
+  // Excess 1200 - 710 = 490. Reduction 269.50. UC = 728.84 - 269.50 = 459.34.
+  // Income = (459.34 + 1200) × 12/52 = 382.92
+  expect(round2(calculateUCIncome(singleState({
+    numChildren: 1,
+    childAges: ['5to15'],
+    adult1Working: true,
+    adult1MonthlyEarnings: 1200,
+  }), UC_RATES))).toBe(382.92);
 });
 
 test('no work allowance for childless working person', () => {
@@ -162,4 +173,60 @@ test('UC tapers cleanly to zero (single, no children)', () => {
 test('uses × 12/52 for monthly-to-weekly conversion', () => {
   const raw = calculateUCIncome(singleState(), UC_RATES);
   expect(raw).toBeCloseTo(UC_RATES.standardAllowance.single25Plus * 12 / 52, 5);
+});
+
+// Benefit cap (outside London). Child Benefit counts towards the cap.
+
+function childBenefitMonthly(n) {
+  return (UC_RATES.childBenefit.eldest + (n - 1) * UC_RATES.childBenefit.additional) * 52 / 12;
+}
+
+function kids(n) {
+  return { numChildren: n, childAges: Array(n).fill('5to15') };
+}
+
+test('benefit cap: couple 25+ with 2 children, no work, is not capped', () => {
+  const r = calculateUC(coupleState(kids(2)), UC_RATES);
+  expect(r.capped).toBe(false);
+});
+
+test('benefit cap: couple 25+ with 3 children, no work, is capped', () => {
+  // Max UC 1578.79 > 1835 - CB 272.35 = 1562.65
+  const r = calculateUC(coupleState(kids(3)), UC_RATES);
+  const limit = UC_RATES.benefitCap.family - childBenefitMonthly(3);
+  expect(r.capped).toBe(true);
+  expect(round2(r.weekly)).toBe(round2(limit * 12 / 52));
+});
+
+test('benefit cap: single parent 25+ with 3 children, no work, is not capped', () => {
+  expect(calculateUC(singleState(kids(3)), UC_RATES).capped).toBe(false);
+});
+
+test('benefit cap: single parent 25+ with 4 children, no work, is capped', () => {
+  const r = calculateUC(singleState(kids(4)), UC_RATES);
+  const limit = UC_RATES.benefitCap.family - childBenefitMonthly(4);
+  expect(r.capped).toBe(true);
+  expect(round2(r.weekly)).toBe(round2(limit * 12 / 52));
+});
+
+test('benefit cap: earnings at the threshold exempt the household', () => {
+  const earnings = UC_RATES.benefitCap.earningsThreshold;
+  const r = calculateUC(coupleState({ ...kids(5), adult1Working: true, adult1MonthlyEarnings: earnings }), UC_RATES);
+  const maxUC = UC_RATES.standardAllowance.coupleAny25Plus + 5 * UC_RATES.childElement;
+  const netUC = maxUC - (earnings - UC_RATES.workAllowanceNoHousing) * UC_RATES.taperRate;
+  expect(r.capped).toBe(false);
+  expect(round2(r.weekly)).toBe(round2((netUC + earnings) * 12 / 52));
+});
+
+test('benefit cap: earnings just below the threshold do not exempt', () => {
+  const earnings = UC_RATES.benefitCap.earningsThreshold - 1;
+  const r = calculateUC(coupleState({ ...kids(5), adult1Working: true, adult1MonthlyEarnings: earnings }), UC_RATES);
+  const limit = UC_RATES.benefitCap.family - childBenefitMonthly(5);
+  expect(r.capped).toBe(true);
+  expect(round2(r.weekly)).toBe(round2((limit + earnings) * 12 / 52));
+});
+
+test('benefit cap: skipped when rates carry no cap', () => {
+  const { benefitCap, ...noCap } = UC_RATES;
+  expect(calculateUC(coupleState(kids(6)), noCap).capped).toBe(false);
 });
