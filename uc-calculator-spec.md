@@ -380,7 +380,16 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 - Plugin shortcode: `[uc_calculator]`. Placeable on any page or post.
 - Admin page at Settings → UC Calculator. Saved values are stored in the `uc_calc_settings` option and merged over `uc_calc_defaults()`.
 - Default rates and costs live in `uc_calc_defaults()` (`uc-calc.php`) and `src/data.js`. After editing `src/` run `npm run build` to regenerate `assets/uc-calc.js`.
-- Updates are delivered from GitHub releases through `inc/updater.php`.
+- Updates come from GitHub releases through `inc/updater.php`, using the `update_plugins_github.com` hook that WordPress core fires for plugins with an `Update URI` header. Update checks work in wp-admin, WP-Cron (so automatic updates can be switched on) and WP-CLI. The latest release is cached for 12 hours; "Check again" on Dashboard → Updates bypasses the cache.
+- Release archives contain only runtime files (`uc-calc.php`, `uninstall.php`, `inc/`, `assets/`, `LICENSE`). `.gitattributes` excludes the rest.
+- Uninstalling (deleting from the Plugins screen) removes the `uc_calc_settings` option and the cached release, on every site of a multisite network. Deactivating clears the cached release only.
+
+### 12.0 Releasing an update
+
+1. Set the new version in both the `Version:` header and `UC_CALC_VERSION` in `uc-calc.php`.
+2. Run `npm test` and `npm run build`, then commit, including `assets/uc-calc.js`.
+3. Push a tag such as `v1.1.0`. The Release workflow checks the version matches the tag, runs the tests, confirms the committed bundle is current, and publishes the release with a `uc-calc.zip` attached. If you drafted the release yourself first, it keeps your notes and just attaches the zip.
+4. Sites see the update within 12 hours, or straight away after "Check again".
 - Single CSS file scoped to the plugin's container class to avoid theme conflicts.
 - Single JS file, vanilla, bundled with esbuild.
 - Translation-ready: all visible strings wrapped in `__()` or equivalent.

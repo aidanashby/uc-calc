@@ -390,12 +390,11 @@ add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'uc_calc_actio
 // ─── GitHub updater ──────────────────────────────────────────────────────────
 
 /**
- * Wires the GitHub-based updater in the admin context only.
+ * Wires the GitHub-based updater. Loaded in every context, not just admin, so
+ * update checks run by WP-Cron (including automatic updates) and WP-CLI see
+ * new releases. The GitHub API is only called when core checks for updates.
  */
 function uc_calc_init_updater() {
-	if ( ! is_admin() ) {
-		return;
-	}
 	if ( ! defined( 'UC_CALC_GITHUB_REPO' ) || '' === UC_CALC_GITHUB_REPO ) {
 		return;
 	}
@@ -403,3 +402,12 @@ function uc_calc_init_updater() {
 	new UC_Calc_Updater( UC_CALC_FILE, UC_CALC_GITHUB_REPO, UC_CALC_VERSION );
 }
 add_action( 'init', 'uc_calc_init_updater' );
+
+/**
+ * Clears the cached GitHub release on deactivation so a reactivated plugin
+ * checks afresh.
+ */
+function uc_calc_deactivate() {
+	delete_transient( 'uc_calc_github_release' );
+}
+register_deactivation_hook( __FILE__, 'uc_calc_deactivate' );

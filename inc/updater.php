@@ -3,7 +3,9 @@
  * GitHub-based plugin updater.
  *
  * Polls the GitHub Releases API for `UC_CALC_GITHUB_REPO` and exposes new
- * versions through the standard WordPress plugin update flow. Caches results
+ * versions through the standard WordPress plugin update flow, via the
+ * `update_plugins_github.com` hook that core fires for plugins whose
+ * `Update URI` header points at GitHub. Caches results
  * via transients (12 hours on success, 30 minutes on transient failure) and
  * renames the unpacked archive folder so WordPress installs the update under
  * the existing plugin slug rather than the GitHub-generated `user-repo-sha`
@@ -40,52 +42,58 @@ class UC_Calc_Updater {
 		$this->repo        = $repo;
 		$this->version     = $version;
 
-		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'inject_update' ] );
+		$host = wp_parse_url( "https://github.com/{$repo}", PHP_URL_HOST );
+		add_filter( "update_plugins_{$host}", [ $this, 'filter_update' ], 10, 3 );
 		add_filter( 'plugins_api', [ $this, 'plugin_information' ], 20, 3 );
 		add_filter( 'upgrader_source_selection', [ $this, 'rename_source' ], 10, 4 );
 		add_action( 'upgrader_process_complete', [ $this, 'flush_cache_after_upgrade' ], 10, 2 );
 	}
 
 	/**
-	 * Inject our release into the update_plugins transient when newer than the installed version.
+	 * Supply release data to WordPress core's update check.
+	 *
+	 * Core calls `update_plugins_{hostname}` for every plugin whose `Update URI`
+	 * header points at that host, in admin, cron and WP-CLI alike, then files the
+	 * result under `response` (newer) or `no_update` (current). Returning data in
+	 * both cases lets the auto-update toggle work.
+	 *
+	 * @param array|false $update      Update data from earlier filters, or false.
+	 * @param array       $plugin_data Plugin headers.
+	 * @param string      $plugin_file Plugin basename.
+	 * @return array|false
 	 */
-	public function inject_update( $transient ) {
-		if ( ! is_object( $transient ) ) {
-			return $transient;
-		}
-		if ( empty( $transient->checked ) ) {
-			return $transient;
+	public function filter_update( $update, $plugin_data, $plugin_file ) {
+		if ( $plugin_file !== $this->plugin_slug ) {
+			return $update;
 		}
 
-		$release = $this->get_latest_release();
+		$release = $this->get_latest_release( $this->is_forced_check() );
 		if ( ! $release ) {
-			return $transient;
+			return $update;
 		}
 
-		$item = (object) [
-			'id'           => $this->plugin_slug,
+		return [
 			'slug'         => $this->plugin_dir,
-			'plugin'       => $this->plugin_slug,
-			'new_version'  => $release['version'],
+			'version'      => $release['version'],
 			'url'          => $release['html_url'],
 			'package'      => $release['zip_url'],
-			'icons'        => [],
-			'banners'      => [],
-			'banners_rtl'  => [],
 			'tested'       => $release['tested'],
 			'requires'     => $release['requires'],
 			'requires_php' => $release['requires_php'],
+			'icons'        => [],
+			'banners'      => [],
+			'banners_rtl'  => [],
 		];
+	}
 
-		if ( version_compare( $this->version, $release['version'], '<' ) ) {
-			$transient->response[ $this->plugin_slug ] = $item;
-		} else {
-			$item->new_version          = $this->version;
-			$item->package              = '';
-			$transient->no_update[ $this->plugin_slug ] = $item;
-		}
-
-		return $transient;
+	/**
+	 * True when an admin clicked "Check again" on Dashboard → Updates, so the
+	 * cached release is bypassed.
+	 */
+	private function is_forced_check() {
+		return is_admin()
+			&& current_user_can( 'update_plugins' )
+			&& ! empty( $_GET['force-check'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -171,9 +179,9 @@ class UC_Calc_Updater {
 		}
 	}
 
-	private function get_latest_release() {
+	private function get_latest_release( $force = false ) {
 		// `false` = no cache entry. Empty array = negative cache (recent failure).
-		$cached = get_transient( $this->cache_key );
+		$cached = $force ? false : get_transient( $this->cache_key );
 		if ( false !== $cached ) {
 			return ( is_array( $cached ) && ! empty( $cached ) ) ? $cached : null;
 		}
