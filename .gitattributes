@@ -12,3 +12,5 @@
 /package.json       export-ignore
 /package-lock.json  export-ignore
 /uc-calculator-spec.md export-ignore
+/docs               export-ignore
+/README.md          export-ignore

@@ -44,7 +44,7 @@ jobs:
           git diff --exit-code -- assets/
 
       - name: Build plugin zip
-        run: git archive --format=zip --prefix=uc-calc/ -o uc-calc.zip "$TAG"
+        run: git archive --format=zip --prefix=uc-calc/ -o uc-calc.zip HEAD
 
       - name: Publish release with zip
         run: |
