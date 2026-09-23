@@ -28,4 +28,4 @@ WordPress plugin (`[uc_calculator]` shortcode) comparing Universal Credit income
 ## Monitoring
 
 - A scheduled Claude Code routine ("UC Calculator monitoring") follows `.claude/routines/uc-monitor.md` and writes reports to `reports/uc-updates/`. Reports are recommendations; apply them by hand.
-- Outstanding setup tasks for the maintainer are in `docs/next-steps.md` (delete when done).
+- Outstanding setup tasks for the maintainer are in `docs/to-do.md` (delete when done).
