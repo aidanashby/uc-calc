@@ -202,7 +202,6 @@ function updateVisibility(s) {
   const adultsDisplay = document.getElementById('num-adults-display');
   if (adultsDisplay) {
     adultsDisplay.textContent = numAdults;
-    adultsDisplay.setAttribute('aria-valuenow', numAdults);
   }
   const adultsDecBtn = document.getElementById('adults-decrease');
   const adultsIncBtn = document.getElementById('adults-increase');
@@ -215,7 +214,6 @@ function updateVisibility(s) {
   const childDisplay = document.getElementById('num-children-display');
   if (childDisplay) {
     childDisplay.textContent = s.numChildren;
-    childDisplay.setAttribute('aria-valuenow', s.numChildren);
   }
   const decBtn = document.getElementById('children-decrease');
   const incBtn = document.getElementById('children-increase');
@@ -462,7 +460,7 @@ function handleTooltipToggle(e) {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
   const form      = document.getElementById('uc-calc-form');
   const basket    = document.getElementById('uc-calc-basket');
   const resetBtn  = document.getElementById('uc-calc-reset');
@@ -495,4 +493,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (resetBtn) resetBtn.addEventListener('click', handleReset);
 
   render(state);
-});
+}
+
+// The script can run after DOMContentLoaded has fired, e.g. when LiteSpeed
+// Cache delays JavaScript until the visitor interacts with the page.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

@@ -23,7 +23,7 @@ The calculator follows the Trussell / JRF "Guarantee Our Essentials" framing. It
 | Server calls | None. No fetch / XHR / WebSocket. All state, calculation, and UI in the browser. |
 | Persistence | None by default. State lives in memory only. Cleared on navigation or reload. No localStorage, sessionStorage, cookies, or query strings written. |
 | Analytics | None on this plugin. WordPress site analytics elsewhere are unaffected. |
-| Bundled data | UC rates, cost values, and scaling rules ship as defaults in the plugin (`uc_calc_defaults()` in `uc-calc.php`, mirrored in `src/data.js`). The site admin can override any value on the Settings → UC Calculator page. |
+| Bundled data | UC rates, cost values, and scaling rules ship as defaults in the plugin (`uc_calc_defaults()` in `uc-calc.php`, mirrored in `src/data.js`). The site admin can override any value on the Settings → UC Calculator page. Only values that differ from the defaults are stored. |
 | Browser support | Modern evergreen browsers, last 2 versions. iOS Safari 15+. No IE. |
 | Page weight | Lightweight: vanilla JS or a small framework. No heavy libraries. Total payload under 50KB if possible. |
 | Mobile | Responsive, mobile-first. Tested at 360px, 768px, 1024px, 1440px widths. |
@@ -321,7 +321,7 @@ Facts in this copy that change over time, and must be checked at each review: th
 
 ### 9.2 Validation
 
-- `adults[i].monthlyEarnings`: number to 2 decimal places, 0 to 20,000, `step="0.01"`. Empty or non-numeric is treated as 0.
+- `adults[i].monthlyEarnings`: number to 2 decimal places, 0 to 20,000, `step="0.01"`. Empty, non-numeric or negative is treated as 0.
 - `numAdults` (1 to 6) and `numChildren` (0 to 8): stepper buttons enforce the bounds and disable at each limit.
 - No form-level submit. Validation happens inline.
 
@@ -367,7 +367,7 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 | ARIA live region | The difference figure is announced when it changes. `aria-live="polite"`. |
 | Colour | Don't rely on red alone for shortfall. The word "Shortfall" must accompany the colour. |
 | Contrast | All text 4.5:1 minimum, large text 3:1. Verify against NBSGF brand colours. |
-| Keyboard | Every input reachable and operable with keyboard alone. Visible focus states. |
+| Keyboard | Every input reachable and operable with keyboard alone. Visible focus states. The adult and child counters are plain + and − buttons with a polite live region for the count (no `spinbutton` role, since there is no arrow-key support). Basket info panels are click-to-open disclosures (`aria-expanded`), not hover tooltips. |
 | Screen reader labels | Each basket row's checkbox label includes the item name and its value, e.g. "Food, £140 per week". |
 | Reduced motion | Respect `prefers-reduced-motion`. No animated transitions on the result figures. |
 | Reading age | All visible copy at reading age 11. |
@@ -378,7 +378,7 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 ## 12. WordPress packaging
 
 - Plugin shortcode: `[uc_calculator]`. Placeable on any page or post.
-- Admin page at Settings → UC Calculator. Saved values are stored in the `uc_calc_settings` option and merged over `uc_calc_defaults()`.
+- Admin page at Settings → UC Calculator. Only values that differ from the defaults are stored, in the `uc_calc_settings` option, and merged over `uc_calc_defaults()`, so fields left unchanged pick up new defaults from each plugin update. A changed field shows its default beneath it. "Reset to defaults" deletes the option.
 - Default rates and costs live in `uc_calc_defaults()` (`uc-calc.php`) and `src/data.js`. After editing `src/` run `npm run build` to regenerate `assets/uc-calc.js`.
 - Updates come from GitHub releases through `inc/updater.php`, using the `update_plugins_github.com` hook that WordPress core fires for plugins with an `Update URI` header. Update checks work in wp-admin, WP-Cron (so automatic updates can be switched on) and WP-CLI. The latest release is cached for 12 hours; "Check again" on Dashboard → Updates bypasses the cache.
 - Release archives contain only runtime files (`uc-calc.php`, `uninstall.php`, `inc/`, `assets/`, `LICENSE`). `.gitattributes` excludes the rest.
@@ -399,8 +399,8 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 
 | Token | Hex | Use |
 |---|---|---|
-| Mid green | `#00ab52` | Emphasis: section labels above headline figures, the active checkbox tick, the input focus ring, small accents intended to draw the eye |
-| Dark green | `#0a3d2e` | Sparingly: the slim header strip on the result panel, the Start again pill, optional thin rule under section headings. Never as the background of a whole section. White text always sits on it. |
+| Mid green | `#00ab52` | Emphasis: the active checkbox tick, the input focus ring, small accents intended to draw the eye |
+| Dark green | `#0a3d2e` | Sparingly: the slim header strip on the result panel, the labels above the income and essentials figures and the basket info buttons (mid green fails contrast there), the Start again pill, optional thin rule under section headings. Never as the background of a whole section. White text always sits on it. |
 | Cream | `#f3f3eb` | Calm neutral background for the basket section if visual separation is needed. Otherwise leave backgrounds unset (white). |
 | Highlight yellow | `#ffe42d` | Reserved for one accent: a thin bar or subtle background behind the active difference label. Used at most once per render so it doesn't lose impact. |
 | Orange | `#ff5414` | Shortfall figure and any error or validation message. Not used for anything else. |

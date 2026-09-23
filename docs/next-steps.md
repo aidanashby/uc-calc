@@ -91,12 +91,11 @@ This first update comes from v1.0.0's updater, which only checks for updates whi
 
 ## 6. Check the live site's saved settings
 
-Saved settings override the plugin's defaults. If anyone ever clicked **Save Settings** on the plugin's settings page, the old figures are stored and will keep being used.
+Saved settings override the plugin's defaults. v1.0.0 stored every field whenever anyone clicked **Save Settings**, so old figures (such as the 673 work allowance) may be stored and still in use. From v1.1.0 the page marks any field that differs from the default, and only changed fields are saved.
 
 - [ ] Go to **Settings → UC Calculator**.
-- [ ] **Work allowance — no housing (monthly)** must be **710**. If it shows 673, change it.
-- [ ] The five new rows (benefit cap for couples or single parents 1835, single 1229.42, earnings threshold 881, Child Benefit eldest 27.05 and each other child 17.90) will show the new defaults. Leave them.
-- [ ] Click **Save Settings**.
+- [ ] Look for fields marked **Changed from the default of …**. **Work allowance — no housing (monthly)** showing 673 is one of these.
+- [ ] If none of the marked values were set on purpose, click **Reset to defaults**. Otherwise change the unwanted ones to their default and click **Save Settings**. Either way, fields left at the default now follow future plugin updates.
 - [ ] Open the calculator page and check:
   - a single adult aged 25 or over shows **£98.05** income and **£19.41** shortfall;
   - two adults in a couple with three children shows **£360.61** income and the benefit cap note.

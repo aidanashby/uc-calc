@@ -12,7 +12,7 @@ WordPress plugin (`[uc_calculator]` shortcode) comparing Universal Credit income
 ## Key rules
 
 - Default rates and costs live in **two places that must match**: `uc_calc_defaults()` in `uc-calc.php` (live defaults) and `src/data.js` (JS fallback and tests). Adding a key also means updating `uc_calc_build_js_data()` and the rows in `inc/settings.php`.
-- Saved admin settings (`uc_calc_settings` option) override the defaults on a live site.
+- Saved admin settings (`uc_calc_settings` option) override the defaults on a live site. Only values that differ from the defaults are stored (from v1.1.0; v1.0.0 stored every field).
 - UC rates and the benefit cap are monthly; Child Benefit and basket costs are weekly.
 - All visible copy is in `inc/shortcode.php` and `uc_calc_i18n_strings()` in `uc-calc.php`, wrapped for translation. The spec mirrors it (§7, §8), so change both.
 - When figures change, recalculate the QA scenarios in spec §13 from the code, and update the placeholder figures in `inc/shortcode.php` if scenario 1 changes.

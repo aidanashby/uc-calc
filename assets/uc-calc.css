@@ -257,7 +257,8 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--uc-mid-green);
+  /* Dark green: mid green is under 3:1 against the cream basket. */
+  color: var(--uc-dark-green);
   font-size: 1rem;
   padding: 0 0.2rem;
   line-height: 1;
@@ -378,7 +379,8 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--uc-mid-green);
+  /* Dark green: mid green is under 3:1 against the light green panel. */
+  color: var(--uc-dark-green);
   margin-bottom: 0.25rem;
 }
 
@@ -517,38 +519,9 @@
 
 /* ─── Basket info panel ──────────────────────────────────────────────────────── */
 
-/* Mobile: panel spans full row width when revealed by JS click */
+/* Panel spans the full row width when opened by the info button */
 .uc-calc__info-panel {
   grid-column: 1 / -1;
-}
-
-/* Desktop: hover tooltip, positioned absolutely near the info button */
-@media (hover: hover) and (pointer: fine) {
-  .uc-calc__basket-row {
-    position: relative;
-  }
-
-  .uc-calc__info-btn {
-    opacity: 0.4;
-    transition: opacity 0.1s;
-  }
-
-  .uc-calc__info-btn:hover,
-  .uc-calc__info-btn:focus-visible {
-    opacity: 1;
-  }
-
-  .uc-calc__info-btn:hover ~ .uc-calc__info-panel,
-  .uc-calc__info-btn:focus-visible ~ .uc-calc__info-panel {
-    display: block !important; /* Override hidden attribute */
-    position: absolute;
-    right: 0;
-    top: calc(100% + 2px);
-    width: 240px;
-    z-index: 50;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    margin: 0;
-  }
 }
 
 /* ─── Responsive breakpoints ────────────────────────────────────────────────── */

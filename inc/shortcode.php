@@ -99,10 +99,7 @@ $basket_items = [
 						<div class="uc-calc__stepper" role="group" aria-labelledby="num-adults-label">
 							<button type="button" class="uc-calc__stepper-btn" id="adults-decrease"
 								aria-label="<?php esc_attr_e( 'One fewer adult', 'uc-calc' ); ?>" disabled>-</button>
-							<span class="uc-calc__stepper-value" role="spinbutton"
-								aria-valuenow="1" aria-valuemin="1" aria-valuemax="6"
-								aria-labelledby="num-adults-label"
-								id="num-adults-display" tabindex="0">1</span>
+							<span class="uc-calc__stepper-value" id="num-adults-display" aria-live="polite">1</span>
 							<button type="button" class="uc-calc__stepper-btn" id="adults-increase"
 								aria-label="<?php esc_attr_e( 'One more adult', 'uc-calc' ); ?>">+</button>
 						</div>
@@ -126,10 +123,7 @@ $basket_items = [
 						<div class="uc-calc__stepper" role="group" aria-labelledby="num-children-label">
 							<button type="button" class="uc-calc__stepper-btn" id="children-decrease"
 								aria-label="<?php esc_attr_e( 'One fewer child', 'uc-calc' ); ?>" disabled>-</button>
-							<span class="uc-calc__stepper-value" role="spinbutton"
-								aria-valuenow="0" aria-valuemin="0" aria-valuemax="8"
-								aria-labelledby="num-children-label"
-								id="num-children-display" tabindex="0">0</span>
+							<span class="uc-calc__stepper-value" id="num-children-display" aria-live="polite">0</span>
 							<button type="button" class="uc-calc__stepper-btn" id="children-increase"
 								aria-label="<?php esc_attr_e( 'One more child', 'uc-calc' ); ?>">+</button>
 						</div>
@@ -176,7 +170,7 @@ $basket_items = [
 								?>"
 								aria-expanded="false"
 								aria-controls="basket-info-<?php echo esc_attr( $key ); ?>">&#9432;</button>
-							<div class="uc-calc__info-panel" id="basket-info-<?php echo esc_attr( $key ); ?>" role="tooltip" hidden>
+							<div class="uc-calc__info-panel" id="basket-info-<?php echo esc_attr( $key ); ?>" hidden>
 								<?php echo esc_html( $item['info'] ); ?>
 							</div>
 						</div>

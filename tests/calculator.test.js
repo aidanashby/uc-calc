@@ -230,3 +230,9 @@ test('benefit cap: skipped when rates carry no cap', () => {
   const { benefitCap, ...noCap } = UC_RATES;
   expect(calculateUC(coupleState(kids(6)), noCap).capped).toBe(false);
 });
+
+test('negative earnings are treated as zero', () => {
+  const negative = calculateUCIncome(singleState({ adult1Working: true, adult1MonthlyEarnings: -500 }), UC_RATES);
+  const none     = calculateUCIncome(singleState(), UC_RATES);
+  expect(round2(negative)).toBe(round2(none));
+});

@@ -43,7 +43,7 @@ function calculateUC(state, rates) {
   }
 
   function earningsOf(a) {
-    return a.working ? (a.monthlyEarnings || 0) : 0;
+    return a.working ? Math.max(0, a.monthlyEarnings || 0) : 0;
   }
 
   if (state.inCouple && adults.length >= 2) {

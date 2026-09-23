@@ -13,38 +13,41 @@ if ( ! current_user_can( 'manage_options' ) ) {
 }
 
 $defaults = uc_calc_defaults();
-$saved    = get_option( 'uc_calc_settings', [] );
-if ( ! is_array( $saved ) ) {
-	$saved = [];
-}
-$s = array_replace_recursive( $defaults, $saved );
-
-$saved_ok = false;
+$notice   = '';
 
 if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 	check_admin_referer( 'uc_calc_settings_save', 'uc_calc_nonce' );
 
-	$posted_rates = isset( $_POST['rates'] ) && is_array( $_POST['rates'] ) ? wp_unslash( $_POST['rates'] ) : [];
-	$posted_costs = isset( $_POST['costs'] ) && is_array( $_POST['costs'] ) ? wp_unslash( $_POST['costs'] ) : [];
+	if ( isset( $_POST['uc_calc_reset'] ) ) {
+		delete_option( 'uc_calc_settings' );
+		$notice = __( 'All values reset to the plugin defaults.', 'uc-calc' );
+	} else {
+		// Store only values that differ from the defaults, so rates and costs
+		// updated in a new plugin release reach every field left unchanged.
+		$new = [];
+		foreach ( $defaults as $group => $keys ) {
+			$posted = isset( $_POST[ $group ] ) && is_array( $_POST[ $group ] ) ? wp_unslash( $_POST[ $group ] ) : [];
+			foreach ( $keys as $key => $default ) {
+				if ( ! isset( $posted[ $key ] ) || ! is_numeric( $posted[ $key ] ) ) {
+					continue;
+				}
+				$value = max( 0.0, (float) $posted[ $key ] );
+				if ( abs( $value - (float) $default ) > 0.0001 ) {
+					$new[ $group ][ $key ] = $value;
+				}
+			}
+		}
 
-	$new = [
-		'rates' => [],
-		'costs' => [],
-	];
-
-	foreach ( array_keys( $defaults['rates'] ) as $key ) {
-		$value          = isset( $posted_rates[ $key ] ) ? (float) $posted_rates[ $key ] : (float) $defaults['rates'][ $key ];
-		$new['rates'][ $key ] = max( 0, $value );
+		if ( $new ) {
+			update_option( 'uc_calc_settings', $new );
+		} else {
+			delete_option( 'uc_calc_settings' );
+		}
+		$notice = __( 'Settings saved.', 'uc-calc' );
 	}
-	foreach ( array_keys( $defaults['costs'] ) as $key ) {
-		$value          = isset( $posted_costs[ $key ] ) ? (float) $posted_costs[ $key ] : (float) $defaults['costs'][ $key ];
-		$new['costs'][ $key ] = max( 0, $value );
-	}
-
-	update_option( 'uc_calc_settings', $new );
-	$s        = array_replace_recursive( $defaults, $new );
-	$saved_ok = true;
 }
+
+$s = uc_calc_get_settings();
 
 /**
  * Renders one row of the settings table.
@@ -58,6 +61,7 @@ if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 function uc_calc_setting_row( $label, $group, $key, $value, $hint = '' ) {
 	$field_id = sanitize_html_class( "uc_{$group}_{$key}" );
 	$name     = "{$group}[{$key}]";
+	$default  = uc_calc_defaults()[ $group ][ $key ];
 	?>
 	<tr>
 		<th scope="row"><label for="<?php echo esc_attr( $field_id ); ?>"><?php echo esc_html( $label ); ?></label></th>
@@ -68,6 +72,14 @@ function uc_calc_setting_row( $label, $group, $key, $value, $hint = '' ) {
 			<?php if ( $hint ) : ?>
 				<p class="description"><?php echo esc_html( $hint ); ?></p>
 			<?php endif; ?>
+			<?php if ( abs( (float) $value - (float) $default ) > 0.0001 ) : ?>
+				<p class="description"><strong>
+					<?php
+					/* translators: %s: the plugin's default value for this field. */
+					echo esc_html( sprintf( __( 'Changed from the default of %s.', 'uc-calc' ), $default ) );
+					?>
+				</strong></p>
+			<?php endif; ?>
 		</td>
 	</tr>
 	<?php
@@ -76,11 +88,11 @@ function uc_calc_setting_row( $label, $group, $key, $value, $hint = '' ) {
 <div class="wrap">
 	<h1><?php esc_html_e( 'UC Calculator Settings', 'uc-calc' ); ?></h1>
 
-	<?php if ( $saved_ok ) : ?>
-		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'uc-calc' ); ?></p></div>
+	<?php if ( $notice ) : ?>
+		<div class="notice notice-success is-dismissible"><p><?php echo esc_html( $notice ); ?></p></div>
 	<?php endif; ?>
 
-	<p><?php esc_html_e( 'All monetary values are in pounds per week unless stated otherwise. Leave a field unchanged to keep the default.', 'uc-calc' ); ?></p>
+	<p><?php esc_html_e( 'All monetary values are in pounds per week unless stated otherwise. Only values you change are saved. Every other field follows the plugin defaults, which are kept up to date with each plugin update.', 'uc-calc' ); ?></p>
 
 	<form method="post" action="">
 		<?php wp_nonce_field( 'uc_calc_settings_save', 'uc_calc_nonce' ); ?>
@@ -190,6 +202,17 @@ function uc_calc_setting_row( $label, $group, $key, $value, $hint = '' ) {
 			?>
 		</table>
 
-		<?php submit_button( __( 'Save Settings', 'uc-calc' ) ); ?>
+		<p class="submit">
+			<?php submit_button( __( 'Save Settings', 'uc-calc' ), 'primary', 'submit', false ); ?>
+			<?php
+			submit_button(
+				__( 'Reset to defaults', 'uc-calc' ),
+				'secondary',
+				'uc_calc_reset',
+				false,
+				[ 'onclick' => 'return confirm(' . wp_json_encode( __( 'Reset every value to the plugin default?', 'uc-calc' ) ) . ');' ]
+			);
+			?>
+		</p>
 	</form>
 </div>

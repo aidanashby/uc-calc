@@ -29,7 +29,7 @@ It does not model the LCWRA, carer or disabled child elements, housing or childc
 
 **Settings → UC Calculator** lists every UC rate, benefit cap figure, Child Benefit rate and basket cost. Rates are monthly and costs are weekly, as labelled.
 
-Saved values override the plugin's defaults. After a plugin update that changes rates or costs, check this page and update any values you saved earlier, or they'll keep the old figures.
+Only values you change are saved; they override the plugin's defaults. Every other field follows the defaults, so it picks up new figures from each plugin update. A changed field shows its default beneath it, and **Reset to defaults** clears every saved value.
 
 ## Updates
 
