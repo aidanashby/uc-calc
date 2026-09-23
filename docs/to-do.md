@@ -2,7 +2,7 @@
 
 Everything left for you to do, in order, as of 23rd September 2026. Tick each box as you go.
 
-v1.1.0 is released on GitHub. The three-column layout and desktop hover panels are built but not released yet (see `CHANGELOG.md`, "Unreleased"). The live site stays on v1.0.0 until you update it.
+v1.2.0 is released on GitHub (see `CHANGELOG.md`). The live site stays on v1.0.0 until you update it.
 
 ---
 
@@ -16,9 +16,11 @@ v1.1.0 is released on GitHub. The three-column layout and desktop hover panels a
 - [x] LiteSpeed: works with **Load JS Deferred** set to Off (your normal setting) and to Deferred.
 - [ ] Screen reader check with NVDA (free, Windows): press Tab to reach **One more adult**, then press Enter. NVDA should read out the new number.
 
-## 2. Test the next release on the dev site
+## 2. Test v1.2.0 on the dev site
 
-Once the three-column layout is released, update the dev site again (**Dashboard → Updates → Check again**), then check:
+- [ ] Update the dev site from v1.1.0 to v1.2.0: **Dashboard → Updates → Check again**, then update UC Calculator. This is the first update through v1.1.0's improved updater.
+
+Then check:
 
 - [ ] On a desktop screen, the calculator shows three columns: household, essentials, and the result at the top of the third.
 - [ ] Make the browser window narrower, to just above tablet width. Income and essentials stack inside the result panel and no figure is cut off.

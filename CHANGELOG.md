@@ -2,7 +2,7 @@
 
 All notable changes to UC Calculator. Dates are release dates.
 
-## [Unreleased]
+## [1.2.0] - 2026-09-23
 
 ### Changed
 - Desktop layout (981px and up, Divi's desktop breakpoint) has three columns: household, essentials, and the result at the top of the third. Tablet and phone still stack them. On small desktop screens, income and essentials stack inside the result panel so the figures fit.
