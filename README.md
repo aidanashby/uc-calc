@@ -37,7 +37,7 @@ The plugin updates itself from this repository's GitHub releases, through the no
 
 ## Releasing a new version
 
-1. In `uc-calc.php`, set the new version in both the `Version:` header and `UC_CALC_VERSION`.
+1. In `uc-calc.php`, set the new version in both the `Version:` header and `UC_CALC_VERSION`, and add a section for it to [`CHANGELOG.md`](CHANGELOG.md).
 2. Run `npm test` and `npm run build`, then commit, including `assets/uc-calc.js`.
 3. Push a tag for the version, for example:
 
@@ -46,7 +46,7 @@ The plugin updates itself from this repository's GitHub releases, through the no
    git push origin v1.1.0
    ```
 
-4. The **Release** GitHub Action checks the version matches the tag, runs the tests, confirms the committed JavaScript is up to date, then publishes the release with `uc-calc.zip` attached. If you drafted the release yourself first, it keeps your notes and just attaches the zip. The action fails, and publishes nothing, if any check fails.
+4. The **Release** GitHub Action checks the version matches the tag, runs the tests, confirms the committed JavaScript is up to date, then publishes the release with `uc-calc.zip` attached and this version's changelog section as its notes. If you drafted the release yourself first, it keeps your notes and just attaches the zip. The action fails, and publishes nothing, if any check fails.
 
 Sites see the new version within 12 hours, or straight away after **Check again**.
 

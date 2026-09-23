@@ -54,5 +54,7 @@ jobs:
             requires=$(sed -n 's/^ \* Requires at least: *//p' uc-calc.php)
             requires_php=$(sed -n 's/^ \* Requires PHP: *//p' uc-calc.php)
             printf 'Requires at least: %s\nRequires PHP: %s\n\n' "$requires" "$requires_php" > notes.md
+            # This version's section of CHANGELOG.md, shown in the WordPress update modal.
+            awk -v v="${TAG#v}" '/^## /{p = index($0, "[" v "]") > 0; next} p' CHANGELOG.md >> notes.md
             gh release create "$TAG" uc-calc.zip --title "$TAG" --notes-file notes.md --generate-notes
           fi

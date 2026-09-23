@@ -386,7 +386,7 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 
 ### 12.0 Releasing an update
 
-1. Set the new version in both the `Version:` header and `UC_CALC_VERSION` in `uc-calc.php`.
+1. Set the new version in both the `Version:` header and `UC_CALC_VERSION` in `uc-calc.php`, and add a section for it to `CHANGELOG.md`.
 2. Run `npm test` and `npm run build`, then commit, including `assets/uc-calc.js`.
 3. Push a tag such as `v1.1.0`. The Release workflow checks the version matches the tag, runs the tests, confirms the committed bundle is current, and publishes the release with a `uc-calc.zip` attached. If you drafted the release yourself first, it keeps your notes and just attaches the zip.
 4. Sites see the update within 12 hours, or straight away after "Check again".

@@ -3,7 +3,7 @@
  * Plugin Name:       UC Calculator
  * Plugin URI:        https://github.com/aidanashby/uc-calc
  * Description:       Universal Credit vs essentials calculator for campaign use. Client-side only, no data collected.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Aidan Ashby
  * Author URI:        https://lucidrhino.design
  * License:           MIT
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'UC_CALC_VERSION', '1.0.0' );
+define( 'UC_CALC_VERSION', '1.1.0' );
 define( 'UC_CALC_FILE', __FILE__ );
 define( 'UC_CALC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'UC_CALC_URL', plugin_dir_url( __FILE__ ) );

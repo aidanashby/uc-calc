@@ -4,13 +4,13 @@ What's left to do after the session on 22nd September 2026, in order. Tick each 
 
 ---
 
-## 1. Review and merge pull request #2
+## 1. Review and merge pull request #2 (done 23rd September 2026)
 
 The routine reads its instructions from `main`, so this must be merged before its first run on **7th December 2026**.
 
-- [ ] Open [PR #2](https://github.com/aidanashby/uc-calc/pull/2) and read the summary.
-- [ ] Skim the spec changes in `uc-calculator-spec.md`, especially §5 (benefit cap), §8 (footer copy) and §13 (QA scenarios).
-- [ ] Mark the PR **Ready for review**, then **Merge**.
+- [x] Open [PR #2](https://github.com/aidanashby/uc-calc/pull/2) and read the summary.
+- [x] Skim the spec changes in `uc-calculator-spec.md`, especially §5 (benefit cap), §8 (footer copy) and §13 (QA scenarios).
+- [x] Mark the PR **Ready for review**, then **Merge**.
 
 Merging does **not** release a new version. Your live site is unaffected until step 5.
 
@@ -80,11 +80,11 @@ A green status on the run only means it didn't crash. Always read the final mess
 
 ## 5. Release the updated plugin (when you're ready)
 
-Nothing has been released yet. The live site is still on v1.0.0. When you want the new version live:
+v1.1.0 was released on 23rd September 2026 (see `CHANGELOG.md`). The live site stays on v1.0.0 until you update it:
 
-- [ ] In `uc-calc.php`, change both `Version: 1.0.0` and `define( 'UC_CALC_VERSION', '1.0.0' );` to `1.1.0`.
-- [ ] Run `npm test` and `npm run build`, commit and push to `main`.
-- [ ] Push the tag: `git tag v1.1.0 && git push origin v1.1.0`. The **Release** GitHub Action checks everything and publishes the release with `uc-calc.zip`. Watch it under the repository's **Actions** tab; this is its first ever run.
+- [x] In `uc-calc.php`, change both `Version: 1.0.0` and `define( 'UC_CALC_VERSION', '1.0.0' );` to `1.1.0`.
+- [x] Run `npm test` and `npm run build`, commit and push to `main`.
+- [x] Push the tag: `git tag v1.1.0 && git push origin v1.1.0`. The **Release** GitHub Action checks everything and publishes the release with `uc-calc.zip`. Watch it under the repository's **Actions** tab; this is its first ever run.
 - [ ] On the live site, go to **Dashboard → Updates**, click **Check again**, and update UC Calculator.
 
 This first update comes from v1.0.0's updater, which only checks for updates while you're in wp-admin. Clicking **Check again** handles that. From v1.1.0 onwards, updates are also found by WordPress's background checks and WP-CLI, and automatic updates work.
