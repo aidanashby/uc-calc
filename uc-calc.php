@@ -3,7 +3,7 @@
  * Plugin Name:       UC Calculator
  * Plugin URI:        https://github.com/aidanashby/uc-calc
  * Description:       Universal Credit vs essentials calculator for campaign use. Client-side only, no data collected.
- * Version:           1.2.0
+ * Version:           1.3.0
  * Author:            Aidan Ashby
  * Author URI:        https://lucidrhino.design
  * License:           MIT
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'UC_CALC_VERSION', '1.2.0' );
+define( 'UC_CALC_VERSION', '1.3.0' );
 define( 'UC_CALC_FILE', __FILE__ );
 define( 'UC_CALC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'UC_CALC_URL', plugin_dir_url( __FILE__ ) );
@@ -81,7 +81,7 @@ function uc_calc_defaults() {
 			'water_8'                => 15,
 			'mobile_perAdult'        => 4,
 			'broadband_flat'         => 5,
-			'travel_working'         => 22,
+			'travel_working'         => 28,
 			'travel_nonWorking'      => 10,
 			'travel_child5to15'      => 4,
 			'toiletries_perPerson'   => 5,
@@ -247,15 +247,15 @@ function uc_calc_i18n_strings() {
 		'states' => [
 			'shortfall' => [
 				'label'   => __( 'Shortfall', 'uc-calc' ),
-				'subtext' => __( 'This is what you’d need to find from somewhere else each week, on top of what UC provides.', 'uc-calc' ),
+				'subtext' => __( 'This is what you’d need to find from somewhere else each week, on top of what UC provides. And that’s before rent and council tax.', 'uc-calc' ),
 			],
 			'even' => [
 				'label'   => __( 'Exactly enough', 'uc-calc' ),
-				'subtext' => __( 'Nothing left for anything unexpected. A washing machine breakdown, a school trip, a winter coat, a funeral, a delayed payment.', 'uc-calc' ),
+				'subtext' => __( 'Nothing left for anything unexpected, and that’s before rent and council tax. A washing machine breakdown, a school trip, a winter coat, a funeral, a delayed payment.', 'uc-calc' ),
 			],
 			'surplus' => [
-				'label'   => __( 'Money left to save or for emergencies', 'uc-calc' ),
-				'subtext' => __( 'This is what’s left after a week of essentials. It has to cover anything unexpected, including replacement clothes and household items, dental costs, a school trip, or a winter coat.', 'uc-calc' ),
+				'label'   => __( 'Left before rent and council tax', 'uc-calc' ),
+				'subtext' => __( 'This is before rent and council tax. Many households on UC have to pay part of their rent from this money. Anything left has to cover the unexpected, like dental costs, a school trip or a winter coat.', 'uc-calc' ),
 			],
 			'empty' => [
 				'label'   => __( 'Money left to save or for emergencies', 'uc-calc' ),

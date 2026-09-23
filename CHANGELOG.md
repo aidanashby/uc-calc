@@ -2,6 +2,16 @@
 
 All notable changes to UC Calculator. Dates are release dates.
 
+## [1.3.0] - 2026-09-23
+
+### Changed
+- Every result now says it's before rent and council tax. Money left over is labelled "Left before rent and council tax" instead of "Money left to save or for emergencies", which overstated what's really left for households who top up their rent.
+- Footer rewritten in five short paragraphs, about a fifth shorter, with no facts lost. It now says the benefit cap is applied without help with rent, and that the tool is an illustration, not a benefits calculator.
+- Travel for a working adult is now £28 a week, the price of First Bus's weekly ticket for the Bristol zone (from 4th January 2026). It was £22, which matched the Weston-super-Mare weekly ticket. The info text now names the ticket. QA scenarios 7, 8, 9 and 12 in the spec are recalculated. On a live site where this value was saved in the settings, update it or click Reset to defaults.
+
+### Fixed
+- Unticking an essential no longer removes it from the list. The row stays, with its cost struck through, and only items that don't apply to the household (such as school uniform with no children aged 5 to 15) are hidden. This appeared in 1.2.0, when hidden rows started hiding properly.
+
 ## [1.2.0] - 2026-09-23
 
 ### Changed
