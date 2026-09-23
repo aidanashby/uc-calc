@@ -35,25 +35,27 @@ A short privacy notice appears at the top of the calculator: *"Everything you en
 
 ## 3. Page structure
 
-One screen, three vertically stacked sections, all visible at once on desktop. On mobile, sections stack and the result panel becomes sticky at the bottom of the viewport.
+Responsive rules use Divi's standard breakpoints: phone up to 767px, tablet 768px to 980px, desktop 981px and up.
+
+**Desktop (981px and up):** three columns, with the result at the top of the third.
 
 ```
-┌─────────────────────────────────────────────────┐
-│ Privacy notice                                  │
-├─────────────────────────────────────────────────┤
-│ A. Tell us about your household                 │
-│    (form inputs)                                │
-├─────────────────────────────────────────────────┤
-│ B. Your weekly essentials                       │
-│    (checkable basket items with live values)    │
-├─────────────────────────────────────────────────┤
-│ C. The result                                   │
-│    Income | Essentials | Difference (live)      │
-├─────────────────────────────────────────────────┤
-│ Footnote: rent and council tax not included     │
-│ Data sources and dates                          │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│ Privacy notice                                              │
+├───────────────────┬───────────────────┬─────────────────────┤
+│ A. Tell us about  │ B. Your weekly    │ C. The result       │
+│    your household │    essentials     │    Income |         │
+│    (form inputs)  │    (checkable     │    Essentials       │
+│                   │    basket items)  │    Difference       │
+├───────────────────┴───────────────────┴─────────────────────┤
+│ Footnote: rent and council tax not included                 │
+│ Data sources and dates                                      │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+When the result column is narrower than 320px (small desktop screens), income and essentials stack instead of sitting side by side, so the figures always fit.
+
+**Tablet and phone (980px and below):** A, B and C stack in that order, with income and essentials side by side in the result panel.
 
 Live update: every input change in section A or B triggers immediate recalculation of section C. No "calculate" button.
 
@@ -233,7 +235,7 @@ All costs use an April basis and are reviewed once a year. The quarterly Ofgem c
 
 ### 6.4 Dated copy in the basket
 
-The info text for energy (April 2026 price cap), water (2026/27), clothing (March 2026 pricing) and TV licence (£180 from 1 April 2026) names its source date. Update it whenever the matching figure changes.
+The info text for energy (April 2026 price cap), water (2026/27), clothing (March 2026 pricing), TV licence (£180 from 1 April 2026) and school uniform (branded-item limit from September 2026, Children's Wellbeing and Schools Act 2026 s.35) names its source date or rule. Update it whenever the matching figure changes.
 
 ---
 
@@ -302,7 +304,7 @@ The threshold figure is filled from `benefitCap.earningsThreshold`. The note is 
 
 Below the calculator, three paragraphs.
 
-> This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC's housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn't risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. Almost half of UC households (46% in February 2026) have money taken off their payment to repay advance loans or other debts, usually up to 15% of the standard rate.
+> This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC's housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn't risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. Almost half of UC households (47% in May 2026) have money taken off their payment to repay advance loans or other debts, usually up to 15% of the standard rate.
 >
 > It covers the standard allowance and child element only, and applies the benefit cap for outside London. It does not include the LCWRA addition, carer element, disabled child addition, Personal Independence Payment, DLA, Child Benefit, or the housing and childcare elements of UC. Child Benefit is not counted as income here, but it is counted towards the benefit cap. If anyone in your household gets a disability or carer benefit, the cap usually does not apply. If any of these apply, your actual UC and support costs may differ. Some households get other help that lowers their costs: free school meals for every child in a household on UC, the £150 Warm Home Discount on energy bills, and Healthy Start payments for some families with a child under 4. For a personal benefits check, contact Citizens Advice or your local advice service. North Bristol & South Gloucestershire Foodbank is not a qualified benefits adviser. This tool is for awareness and campaigning only.
 >
@@ -367,7 +369,7 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 | ARIA live region | The difference figure is announced when it changes. `aria-live="polite"`. |
 | Colour | Don't rely on red alone for shortfall. The word "Shortfall" must accompany the colour. |
 | Contrast | All text 4.5:1 minimum, large text 3:1. Verify against NBSGF brand colours. |
-| Keyboard | Every input reachable and operable with keyboard alone. Visible focus states. The adult and child counters are plain + and − buttons with a polite live region for the count (no `spinbutton` role, since there is no arrow-key support). Basket info panels are click-to-open disclosures (`aria-expanded`), not hover tooltips. |
+| Keyboard | Every input reachable and operable with keyboard alone. Visible focus states. The adult and child counters are plain + and − buttons with a polite live region for the count (no `spinbutton` role, since there is no arrow-key support). Basket info panels are disclosures (`aria-expanded`). On desktop with a mouse (981px and up) the panel is an overlay that opens on hover and stays open while the pointer is over the button or the panel; click pins it open, and Escape or a click elsewhere closes it (WCAG 1.4.13). On tablet and phone, tap toggles the panel inline below the row. The info button is never faded. |
 | Screen reader labels | Each basket row's checkbox label includes the item name and its value, e.g. "Food, £140 per week". |
 | Reduced motion | Respect `prefers-reduced-motion`. No animated transitions on the result figures. |
 | Reading age | All visible copy at reading age 11. |

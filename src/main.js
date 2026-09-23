@@ -449,13 +449,76 @@ function handleReset() {
   render(state);
 }
 
-function handleTooltipToggle(e) {
-  const btn = e.target.closest('.uc-calc__info-btn');
-  if (!btn) return;
+// ─── Info panels ──────────────────────────────────────────────────────────────
+// Desktop (Divi's desktop breakpoint, 981px and up, with a mouse): the panel is
+// an overlay that opens on hover and stays open while the pointer is over the
+// button or the panel. Click pins it open; Escape or a click elsewhere closes
+// it. Tablet and below: tap toggles the panel inline below the row.
+// Keep DESKTOP_QUERY in step with the matching @media rule in uc-calc.css.
+
+const DESKTOP_QUERY = '(min-width: 981px) and (hover: hover)';
+const HOVER_CLOSE_DELAY = 150;
+
+function isDesktop() {
+  return typeof window.matchMedia === 'function' && window.matchMedia(DESKTOP_QUERY).matches;
+}
+
+function setInfoPanel(btn, open) {
   const panel = document.getElementById(btn.getAttribute('aria-controls'));
   if (!panel) return;
-  panel.hidden = !panel.hidden;
-  btn.setAttribute('aria-expanded', String(!panel.hidden));
+  panel.hidden = !open;
+  btn.setAttribute('aria-expanded', String(open));
+}
+
+function closeInfoPanels(buttons, except) {
+  buttons.forEach(btn => {
+    if (btn === except) return;
+    btn.dataset.pinned = 'false';
+    setInfoPanel(btn, false);
+  });
+}
+
+function initInfoPanels(container) {
+  const buttons = Array.from(container.querySelectorAll('.uc-calc__info-btn'));
+  const timers  = new Map();
+
+  buttons.forEach(btn => {
+    const panel = document.getElementById(btn.getAttribute('aria-controls'));
+    if (!panel) return;
+
+    const hoverOpen = () => {
+      clearTimeout(timers.get(btn));
+      closeInfoPanels(buttons.filter(b => b.dataset.pinned !== 'true'), btn);
+      setInfoPanel(btn, true);
+    };
+    const hoverClose = () => {
+      timers.set(btn, setTimeout(() => {
+        if (btn.dataset.pinned !== 'true') setInfoPanel(btn, false);
+      }, HOVER_CLOSE_DELAY));
+    };
+
+    [btn, panel].forEach(el => {
+      el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' && isDesktop()) hoverOpen(); });
+      el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && isDesktop()) hoverClose(); });
+    });
+
+    btn.addEventListener('click', () => {
+      const pinned = btn.dataset.pinned !== 'true';
+      btn.dataset.pinned = String(pinned);
+      clearTimeout(timers.get(btn));
+      if (pinned && isDesktop()) closeInfoPanels(buttons, btn);
+      setInfoPanel(btn, pinned || (isDesktop() && btn.matches(':hover')));
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeInfoPanels(buttons);
+  });
+
+  document.addEventListener('click', e => {
+    if (!isDesktop() || e.target.closest('.uc-calc__info-btn, .uc-calc__info-panel')) return;
+    closeInfoPanels(buttons);
+  });
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
@@ -481,14 +544,13 @@ function init() {
 
   if (basket) basket.addEventListener('change', handleBasketChange);
 
-  if (container) container.addEventListener('click', e => {
-    const stepperIds = ['adults-increase', 'adults-decrease', 'children-increase', 'children-decrease'];
-    if (stepperIds.includes(e.target.id)) {
-      handleStepperClick(e.target.id);
-      return;
-    }
-    handleTooltipToggle(e);
-  });
+  if (container) {
+    container.addEventListener('click', e => {
+      const stepperIds = ['adults-increase', 'adults-decrease', 'children-increase', 'children-decrease'];
+      if (stepperIds.includes(e.target.id)) handleStepperClick(e.target.id);
+    });
+    initInfoPanels(container);
+  }
 
   if (resetBtn) resetBtn.addEventListener('click', handleReset);
 

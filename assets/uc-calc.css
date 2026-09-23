@@ -306,6 +306,11 @@
   border-bottom: 1px solid var(--uc-rule-cream);
 }
 
+/* display: grid above would otherwise override the hidden attribute. */
+.uc-calc__basket-row[hidden] {
+  display: none;
+}
+
 .uc-calc__basket-row:last-child {
   border-bottom: none;
 }
@@ -500,7 +505,10 @@
   margin-top: 0;
 }
 
-/* ─── Two-column layout ──────────────────────────────────────────────────────── */
+/* ─── Layout ─────────────────────────────────────────────────────────────────── */
+/* Divi breakpoints: phone up to 767px, tablet 768px to 980px, desktop 981px up.
+   Tablet and below stack household, basket, result. Desktop has three columns
+   with the result in the third. */
 
 .uc-calc__layout {
   display: flex;
@@ -508,27 +516,56 @@
   gap: 0;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 981px) {
   .uc-calc__layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
     align-items: start;
+  }
+
+  .uc-calc__col--result {
+    container-type: inline-size;
+  }
+}
+
+/* Narrow desktop widths: stack income above essentials so the figures fit.
+   Only the desktop result column is a container, so tablet and phone keep
+   the side-by-side figures. */
+@container (max-width: 320px) {
+  .uc-calc__result-top {
+    grid-template-columns: 1fr;
+  }
+
+  .uc-calc__result-col:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--uc-rule);
   }
 }
 
 /* ─── Basket info panel ──────────────────────────────────────────────────────── */
 
-/* Panel spans the full row width when opened by the info button */
+/* Tablet and below: the panel opens inline, spanning the full row width */
 .uc-calc__info-panel {
   grid-column: 1 / -1;
 }
 
-/* ─── Responsive breakpoints ────────────────────────────────────────────────── */
+/* Desktop with a mouse: the panel is an overlay below the row. Keep this query
+   in step with DESKTOP_QUERY in src/main.js. */
+@media (min-width: 981px) and (hover: hover) {
+  .uc-calc__basket-row {
+    position: relative;
+  }
 
-@media (min-width: 1024px) {
-  .uc-calc__result-figure--large {
-    font-size: 3rem;
+  .uc-calc__info-panel {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 260px;
+    max-width: 100%;
+    z-index: 50;
+    margin: 0;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   }
 }
 

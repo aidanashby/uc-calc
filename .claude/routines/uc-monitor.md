@@ -63,7 +63,7 @@ All costs are on an **April basis** and are updated once a year. Do not recommen
 Check every run. The text is in `inc/shortcode.php` and `uc-calc.php`, mirrored in spec §7.4 and §8.
 
 - Local Housing Allowance: the footer says it "hasn't risen since April 2024". Wrong as soon as LHA rates are raised.
-- Deductions: "Almost half of UC households (46% in February 2026) … usually up to 15% of the standard rate". Check the latest DWP UC deductions statistics and the Fair Repayment Rate cap.
+- Deductions: "Almost half of UC households (47% in May 2026) … usually up to 15% of the standard rate". Check the latest DWP UC deductions statistics and the Fair Repayment Rate cap.
 - Warm Home Discount: £150, and whether households on UC still qualify.
 - Free school meals: every child in a household on UC in England (from September 2026).
 - Healthy Start: families with a child under 4, and the earnings limit.
@@ -75,7 +75,7 @@ Check every run. The text is in `inc/shortcode.php` and `uc-calc.php`, mirrored 
 
 Search the web first. Prefer these sources, most authoritative first. The list is a preference, not a limit: use any other source you need, but say which you used.
 
-- **Primary:** gov.uk (DWP, HM Treasury, HMRC, the "Benefit and pension rates" page, written ministerial statements, DWP statistics), legislation.gov.uk (uprating orders and other statutory instruments), parliament.uk (Hansard, House of Commons Library briefings, deposited papers), Ofgem, ONS, Ofcom, Bristol Water, Wessex Water, Water UK, First Bus, West of England Mayoral Combined Authority, TV Licensing, the Department for Education.
+- **Primary:** gov.uk (DWP, HM Treasury, HMRC, the "Benefit and pension rates" page, written ministerial statements, DWP statistics), legislation.gov.uk (uprating orders and other statutory instruments), parliament.uk (Hansard, House of Commons Library briefings, deposited papers), Ofgem, ONS, Ofcom, Bristol Water, Wessex Water, Water UK, First Bus, West of England Mayoral Combined Authority, TV Licensing, the Department for Education, the NHS (Healthy Start).
 - **Secondary** (for early warning and cross-checking): CPAG, Rightsnet, Turn2us, entitledto, Citizens Advice, Institute for Fiscal Studies, Resolution Foundation, Joseph Rowntree Foundation, Trussell, Policy in Practice, MoneySavingExpert.
 
 Rules:
@@ -152,7 +152,7 @@ To recalculate the QA scenarios and find failing tests: in a scratch copy of the
 
 ## 7. Save and notify
 
-1. **If there is a report:** commit only `reports/uc-updates/YYYY-MM-DD.md` to `main` with the message `UC update report: 7th December 2026` and push to `main`. You are authorised to push to `main` for this one file, and for nothing else. If the push is rejected (for example by branch protection), push the file to a new branch `uc-updates/YYYY-MM-DD`, open a draft pull request into `main`, and say so in the notification.
+1. **If there is a report:** commit only `reports/uc-updates/YYYY-MM-DD.md` to `main` with the message `UC update report: 7th December 2026` and push to `main`. You are authorised to push to `main` for this one file, and for nothing else. If the push is rejected (for example by branch protection), push the file to a new branch `uc-updates/YYYY-MM-DD`, open a draft pull request into `main`, and say so in the notification. If that fails too, put the report's full Markdown text in your final message so it is not lost when the session ends, and say the push failed and why.
 2. **Your final message is the notification.** Keep it short:
    - Changes found: "UC check, 7th December 2026: 3 changes needed (standard allowances, child element, Ofgem cap). Report: <link to the file on GitHub>. Most urgent: … from 6th April 2027."
    - No changes: "UC check, 7th December 2026: no changes needed. Checked: … ." Add one line listing outstanding items from the previous report, if any.

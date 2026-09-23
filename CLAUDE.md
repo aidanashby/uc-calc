@@ -18,11 +18,13 @@ WordPress plugin (`[uc_calculator]` shortcode) comparing Universal Credit income
 - When figures change, recalculate the QA scenarios in spec §13 from the code, and update the placeholder figures in `inc/shortcode.php` if scenario 1 changes.
 - Costs stay on an April basis between annual reviews.
 - British English, plain language (reading age 11 for visitor-facing copy), no em dashes in new text.
+- Responsive CSS uses Divi's breakpoints: phone up to 767px, tablet 768px to 980px, desktop 981px and up. The desktop info-panel query in `assets/uc-calc.css` must match `DESKTOP_QUERY` in `src/main.js`.
 
 ## Releases and updates
 
 - Version is set in two places in `uc-calc.php`: the `Version:` header and `UC_CALC_VERSION`. Add a `## [x.y.z] - date` section to `CHANGELOG.md`; the release workflow uses it as the release notes. Only release when the maintainer asks.
 - Pushing a `v*` tag runs `.github/workflows/release.yml`, which verifies and attaches `uc-calc.zip`.
+- Repository rulesets: `main` blocks force-pushes and deletion; `v*` tags can only be created, moved or deleted by repo admins.
 - `inc/updater.php` reads GitHub releases via core's `update_plugins_github.com` hook. `.gitattributes` keeps dev files out of release zips.
 
 ## Monitoring

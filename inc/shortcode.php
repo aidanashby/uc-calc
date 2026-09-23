@@ -49,7 +49,7 @@ $basket_items = [
 	],
 	'schoolUniform' => [
 		'label' => __( 'School uniform and shoes', 'uc-calc' ),
-		'info'  => __( 'Based on typical school uniform costs averaged across primary and secondary schools in England, including the statutory cap on branded items. Shown only when you have children aged 5 to 15.', 'uc-calc' ),
+		'info'  => __( 'Based on typical school uniform costs averaged across primary and secondary schools in England. Since September 2026, schools can ask for no more than 3 branded items, or 4 at secondary school if one is a tie. Shown only when you have children aged 5 to 15.', 'uc-calc' ),
 	],
 	'sundries' => [
 		'label' => __( 'Sundries', 'uc-calc' ),
@@ -140,7 +140,7 @@ $basket_items = [
 			</section>
 		</div>
 
-		<div class="uc-calc__col uc-calc__col--right">
+		<div class="uc-calc__col uc-calc__col--basket">
 
 			<section class="uc-calc__section uc-calc__section--basket" aria-labelledby="uc-calc-basket-heading">
 				<h2 class="uc-calc__section-heading" id="uc-calc-basket-heading">
@@ -178,6 +178,10 @@ $basket_items = [
 
 				</div>
 			</section>
+
+		</div>
+
+		<div class="uc-calc__col uc-calc__col--result">
 
 			<section class="uc-calc__section uc-calc__result" id="uc-calc-result"
 				aria-labelledby="uc-calc-result-heading" aria-live="polite" aria-atomic="true">
@@ -218,7 +222,7 @@ $basket_items = [
 
 	<footer class="uc-calc__footer">
 		<p>
-			<?php esc_html_e( 'This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC’s housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn’t risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. Almost half of UC households (46% in February 2026) have money taken off their payment to repay advance loans or other debts, usually up to 15% of the standard rate.', 'uc-calc' ); ?>
+			<?php esc_html_e( 'This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC’s housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn’t risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. Almost half of UC households (47% in May 2026) have money taken off their payment to repay advance loans or other debts, usually up to 15% of the standard rate.', 'uc-calc' ); ?>
 		</p>
 		<p>
 			<?php
