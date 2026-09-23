@@ -175,7 +175,7 @@ function uc_calc_setting_row( $label, $group, $key, $value, $hint = '' ) {
 		<h2><?php esc_html_e( 'Travel', 'uc-calc' ); ?></h2>
 		<table class="form-table" role="presentation">
 			<?php
-			uc_calc_setting_row( __( 'Working adult (weekly bus pass)', 'uc-calc' ),  'costs', 'travel_working',    $s['costs']['travel_working'] );
+			uc_calc_setting_row( __( 'Working adult (First Bus weekly ticket, Bristol zone)', 'uc-calc' ),  'costs', 'travel_working',    $s['costs']['travel_working'] );
 			uc_calc_setting_row( __( 'Non-working adult (ad-hoc trips)', 'uc-calc' ), 'costs', 'travel_nonWorking', $s['costs']['travel_nonWorking'] );
 			uc_calc_setting_row( __( 'Child 5–15 per week', 'uc-calc' ),              'costs', 'travel_child5to15', $s['costs']['travel_child5to15'], __( 'Children under 5 travel free.', 'uc-calc' ) );
 			?>

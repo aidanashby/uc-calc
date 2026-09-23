@@ -60,8 +60,8 @@ test('surplus: type and no colour class', () => {
   expect(result.colourClass).toBe('');
 });
 
-test('surplus: difference is positive', () => {
-  expect(getResultState(200, 100).difference).toBeCloseTo(100, 1);
+test('difference is rounded, so near-equal totals count as even', () => {
+  expect(getResultState(100.3, 50.1 + 50.2).type).toBe('even');
 });
 
 // getResultState — empty basket
@@ -83,6 +83,10 @@ test('COPY exposes all four states', () => {
 test('COPY shortfall mentions UC', () => {
   expect(COPY.shortfall.label).toBe('Shortfall');
   expect(COPY.shortfall.subtext).toMatch(/UC provides/);
+});
+
+test('COPY says results are before rent and council tax', () => {
+  ['shortfall', 'even', 'surplus'].forEach(k => expect(COPY[k].subtext).toMatch(/before rent and council tax/));
 });
 
 test('COPY empty-basket guidance is specific', () => {

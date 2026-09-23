@@ -33,7 +33,7 @@ $basket_items = [
 	],
 	'travel' => [
 		'label' => __( 'Travel (bus)', 'uc-calc' ),
-		'info'  => __( 'Based on First Bus weekly pass rates for Bristol. Working adults are shown the cost of getting to work most days. Non-working adults are shown a lower rate for ad-hoc essential trips.', 'uc-calc' ),
+		'info'  => __( 'Based on First Bus fares in Bristol. Each working adult is shown a weekly ticket for the Bristol zone (£28 since January 2026). Adults not in work are shown a lower amount for occasional essential trips.', 'uc-calc' ),
 	],
 	'toiletries' => [
 		'label' => __( 'Toiletries and period products', 'uc-calc' ),
@@ -131,6 +131,7 @@ $basket_items = [
 
 					<div id="child-ages-container" aria-live="polite" aria-atomic="false"></div>
 
+
 				</form>
 
 				<button type="button" class="uc-calc__reset" id="uc-calc-reset">
@@ -222,21 +223,30 @@ $basket_items = [
 
 	<footer class="uc-calc__footer">
 		<p>
-			<?php esc_html_e( 'This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC’s housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn’t risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. Almost half of UC households (47% in May 2026) have money taken off their payment to repay advance loans or other debts, usually up to 15% of the standard rate.', 'uc-calc' ); ?>
+			<?php esc_html_e( 'This shows how far the basic amount of Universal Credit has to stretch each week, leaving out rent and council tax. UC and Council Tax Reduction help with these, but often don’t cover the full cost. In Bristol, the most UC pays towards rent hasn’t gone up since April 2024. That means many households pay part of their rent or council tax from the money shown here.', 'uc-calc' ); ?>
+		</p>
+		<p>
+			<?php esc_html_e( 'Almost half of households on UC (47% in May 2026) also have money taken off their payment to repay debts, usually up to 15% of the basic amount.', 'uc-calc' ); ?>
+		</p>
+		<p>
+			<?php esc_html_e( 'It includes the basic amount and the child element only. It leaves out other parts of UC, disability and carer benefits such as PIP and DLA, and Child Benefit. It applies the benefit cap for outside London, counting Child Benefit but not help with rent, so for renters the cap may apply sooner. The cap usually doesn’t apply if someone gets a disability or carer benefit.', 'uc-calc' ); ?>
+		</p>
+		<p>
+			<?php esc_html_e( 'Every child in a family on UC can get free school meals, and some households can get the £150 Warm Home Discount or Healthy Start.', 'uc-calc' ); ?>
 		</p>
 		<p>
 			<?php
 			echo wp_kses_post(
 				sprintf(
 					/* translators: %s: link to Citizens Advice. */
-					__( 'It covers the standard allowance and child element only, and applies the benefit cap for outside London. It does not include the LCWRA addition, carer element, disabled child addition, Personal Independence Payment, DLA, Child Benefit, or the housing and childcare elements of UC. Child Benefit is not counted as income here, but it is counted towards the benefit cap. If anyone in your household gets a disability or carer benefit, the cap usually does not apply. If any of these apply, your actual UC and support costs may differ. Some households get other help that lowers their costs: free school meals for every child in a household on UC, the £150 Warm Home Discount on energy bills, and Healthy Start payments for some families with a child under 4. For a personal benefits check, contact %s or your local advice service. North Bristol & South Gloucestershire Foodbank is not a qualified benefits adviser. This tool is for awareness and campaigning only.', 'uc-calc' ),
+					__( 'For advice about your own situation, contact %s or your local advice service. North Bristol & South Gloucestershire Foodbank isn’t a benefits adviser. This is an illustration to raise awareness, not a benefits calculator.', 'uc-calc' ),
 					'<a href="https://www.citizensadvice.org.uk/">' . esc_html__( 'Citizens Advice', 'uc-calc' ) . '</a>'
 				)
 			);
 			?>
 		</p>
 		<p class="uc-calc__footer-sources">
-			<?php esc_html_e( 'Costs reflect April 2026 prices for Bristol and South Gloucestershire, at a realistic low-budget level. Data: Ofgem (April 2026 price cap), DWP UC rates and benefit cap April 2026, HMRC Child Benefit rates April 2026, First Bus fares January 2026, Bristol Water and Wessex Water 2026/27, retailer pricing March 2026, TV Licensing April 2026.', 'uc-calc' ); ?>
+			<?php esc_html_e( 'Costs are April 2026 prices for Bristol and South Gloucestershire, at a realistic low-budget level. Sources: DWP UC rates and benefit cap, HMRC Child Benefit and TV Licensing (April 2026), Ofgem price cap (April 2026), Bristol Water and Wessex Water (2026/27), First Bus fares (January 2026), retailer prices (March 2026).', 'uc-calc' ); ?>
 		</p>
 	</footer>
 

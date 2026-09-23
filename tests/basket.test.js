@@ -107,24 +107,24 @@ test('travel: 1 adult, not working → £10', () => {
   expect(calculateBasketCosts(state(), COSTS).travel).toBe(10);
 });
 
-test('travel: 1 adult, working → £22', () => {
-  expect(calculateBasketCosts(state({ adult1Working: true }), COSTS).travel).toBe(22);
+test('travel: 1 adult, working → £28', () => {
+  expect(calculateBasketCosts(state({ adult1Working: true }), COSTS).travel).toBe(28);
 });
 
 test('travel: 2 adults, neither working → £20', () => {
   expect(calculateBasketCosts(state({ numAdults: 2 }), COSTS).travel).toBe(20);
 });
 
-test('travel: 2 adults, adult1 working only → £32', () => {
-  expect(calculateBasketCosts(state({ numAdults: 2, adult1Working: true }), COSTS).travel).toBe(32);
+test('travel: 2 adults, adult1 working only → £38', () => {
+  expect(calculateBasketCosts(state({ numAdults: 2, adult1Working: true }), COSTS).travel).toBe(38);
 });
 
-test('travel: 2 adults, both working → £44', () => {
-  expect(calculateBasketCosts(state({ numAdults: 2, adult1Working: true, adult2Working: true }), COSTS).travel).toBe(44);
+test('travel: 2 adults, both working → £56', () => {
+  expect(calculateBasketCosts(state({ numAdults: 2, adult1Working: true, adult2Working: true }), COSTS).travel).toBe(56);
 });
 
-test('travel: 3 adults, all working → £66', () => {
-  expect(calculateBasketCosts(state({ numAdults: 3, adult1Working: true, adult2Working: true }), COSTS).travel).toBe(66);
+test('travel: 3 adults, all working → £84', () => {
+  expect(calculateBasketCosts(state({ numAdults: 3, adult1Working: true, adult2Working: true }), COSTS).travel).toBe(84);
 });
 
 test('travel: child 5-to-15 adds £4', () => {
@@ -235,4 +235,14 @@ test('school uniform unticked: £0 even with 5-to-15 children', () => {
     basket: { ...ALL_TICKED, schoolUniform: false },
   }), COSTS);
   expect(result.schoolUniform).toBe(0);
+});
+
+test('unticked item keeps its cost in raw, so its row stays visible', () => {
+  const costs = calculateBasketCosts(state({ basket: { ...ALL_TICKED, food: false } }), COSTS);
+  expect(costs.food).toBe(0);
+  expect(costs.raw.food).toBe(35);
+});
+
+test('school uniform raw cost is 0 with no 5-to-15 children, so its row hides', () => {
+  expect(calculateBasketCosts(state(), COSTS).raw.schoolUniform).toBe(0);
 });

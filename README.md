@@ -10,7 +10,7 @@ The full design, including every rate, formula, piece of copy and QA scenario, i
 
 - **Income:** UC standard allowance plus the child element for each child, reduced by the 55% earnings taper (with the work allowance for households with children), then limited by the benefit cap for outside London. Earnings are added on top. Shown per week.
 - **Essentials:** 12 weekly costs (food, energy, water, mobile, broadband, bus travel, toiletries, cleaning, clothing, school uniform, sundries, TV licence) that scale with household size. Visitors can untick any item.
-- **Difference:** the weekly shortfall, or what's left over.
+- **Difference:** the weekly shortfall, or what's left over. Every result says it's before rent and council tax, which many households on UC partly pay from the same money.
 
 It does not model the LCWRA, carer or disabled child elements, housing or childcare costs, PIP, DLA or deductions. The footer says so.
 

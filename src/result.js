@@ -6,15 +6,15 @@
 const COPY = {
   shortfall: {
     label: 'Shortfall',
-    subtext: 'This is what you’d need to find from somewhere else each week, on top of what UC provides.',
+    subtext: 'This is what you’d need to find from somewhere else each week, on top of what UC provides. And that’s before rent and council tax.',
   },
   even: {
     label: 'Exactly enough',
-    subtext: 'Nothing left for anything unexpected. A washing machine breakdown, a school trip, a winter coat, a funeral, a delayed payment.',
+    subtext: 'Nothing left for anything unexpected, and that’s before rent and council tax. A washing machine breakdown, a school trip, a winter coat, a funeral, a delayed payment.',
   },
   surplus: {
-    label: 'Money left to save or for emergencies',
-    subtext: 'This is what’s left after a week of essentials. It has to cover anything unexpected, including replacement clothes and household items, dental costs, a school trip, or a winter coat.',
+    label: 'Left before rent and council tax',
+    subtext: 'This is before rent and council tax. Many households on UC have to pay part of their rent from this money. Anything left has to cover the unexpected, like dental costs, a school trip or a winter coat.',
   },
   empty: {
     label: 'Money left to save or for emergencies',
@@ -38,6 +38,8 @@ function formatCurrency(n) {
   });
 }
 
+const round2 = n => Math.round(n * 100) / 100;
+
 /**
  * Determine the display state from income and essentials totals.
  *
@@ -46,14 +48,14 @@ function formatCurrency(n) {
  * @returns {{ type: 'empty'|'shortfall'|'even'|'surplus', colourClass: string, difference: number }}
  */
 function getResultState(income, essentials) {
-  const roundedIncome     = Math.round(income * 100) / 100;
-  const roundedEssentials = Math.round(essentials * 100) / 100;
+  const roundedIncome     = round2(income);
+  const roundedEssentials = round2(essentials);
 
   if (roundedEssentials === 0) {
     return { type: 'empty', colourClass: '', difference: roundedIncome };
   }
 
-  const diff = roundedIncome - roundedEssentials;
+  const diff = round2(roundedIncome - roundedEssentials);
 
   if (diff < 0) {
     return { type: 'shortfall', colourClass: 'uc-calc--shortfall', difference: Math.abs(diff) };

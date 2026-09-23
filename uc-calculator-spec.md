@@ -174,7 +174,7 @@ With 2026/27 rates the cap first applies, with no earnings, to a couple with 3 c
 
 ### 6.1 Display
 
-Each row shows: checkbox + plain English label + calculated weekly £ value + info button that opens a short explanation of how it was calculated. A row is hidden when its value is £0 (for example, school uniform when there are no children aged 5 to 15).
+Each row shows: checkbox + plain English label + calculated weekly £ value + info button that opens a short explanation of how it was calculated. A row is hidden only when the item doesn't apply to the household, meaning it would cost £0 even if ticked (for example, school uniform when there are no children aged 5 to 15). An unticked row stays visible, with its cost struck through, and doesn't count towards the total.
 
 ### 6.2 Cost values (April 2026 prices, Bristol and South Glos averaged)
 
@@ -199,7 +199,7 @@ const COSTS = {
   mobile:        { perAdult: 4 },
   broadband:     { flat: 5 },
   travel: {
-    workingAdult:    22,  // weekly bus pass equivalent
+    workingAdult:    28,  // First Bus FirstWeek, Bristol zone, from 4th January 2026
     nonWorkingAdult: 10,  // ad-hoc essential trips
     child5to15:      4,   // under 5s travel free
   },
@@ -235,7 +235,7 @@ All costs use an April basis and are reviewed once a year. The quarterly Ofgem c
 
 ### 6.4 Dated copy in the basket
 
-The info text for energy (April 2026 price cap), water (2026/27), clothing (March 2026 pricing), TV licence (£180 from 1 April 2026) and school uniform (branded-item limit from September 2026, Children's Wellbeing and Schools Act 2026 s.35) names its source date or rule. Update it whenever the matching figure changes.
+The info text for energy (April 2026 price cap), water (2026/27), clothing (March 2026 pricing), TV licence (£180 from 1 April 2026), travel (First Bus weekly ticket, £28 since January 2026) and school uniform (branded-item limit from September 2026, Children's Wellbeing and Schools Act 2026 s.35) names its source date or rule. Update it whenever the matching figure changes.
 
 ---
 
@@ -266,22 +266,26 @@ The difference panel is the largest visual element.
 difference = income - essentials
 ```
 
+Both figures are rounded to the penny before subtracting, and the difference is rounded again.
+
+Every message says the result is *before* rent and council tax, because many households on UC pay part of these from the standard allowance. Visitors are mostly people who don't get UC, so it doesn't ask what a household pays towards rent.
+
 If `difference < 0` (essentials exceed income):
 - Display `£X.XX` in brand orange `#ff5414`
 - Label: "Shortfall"
-- Subtext: "This is what you'd need to find from somewhere else each week, on top of what UC provides."
+- Subtext: "This is what you'd need to find from somewhere else each week, on top of what UC provides. And that's before rent and council tax."
 
 If `difference == 0`:
 - Display `£0.00` in default text colour
 - Label: "Exactly enough"
-- Subtext: "Nothing left for anything unexpected. A washing machine breakdown, a school trip, a winter coat, a funeral, a delayed payment."
+- Subtext: "Nothing left for anything unexpected, and that's before rent and council tax. A washing machine breakdown, a school trip, a winter coat, a funeral, a delayed payment."
 
 If `difference > 0`:
 - Display `£X.XX` in default text colour. Do not use green: it implies "all is well" and undercuts the campaign point.
-- Label: "Money left to save or for emergencies"
-- Subtext: "This is what's left after a week of essentials. It has to cover anything unexpected, including replacement clothes and household items, dental costs, a school trip, or a winter coat."
+- Label: "Left before rent and council tax"
+- Subtext: "This is before rent and council tax. Many households on UC have to pay part of their rent from this money. Anything left has to cover the unexpected, like dental costs, a school trip or a winter coat."
 
-Headline figures (income, essentials, difference) sit in a result panel with a slim dark green `#0a3d2e` strip across the top carrying the section heading in white uppercase. The income and essentials labels above their figures use mid green `#00ab52` for emphasis. Yellow `#ffe42d` is reserved for a single optional highlight bar behind the active state of the difference label, used sparingly so it retains impact.
+Headline figures (income, essentials, difference) sit in a result panel with a slim dark green `#0a3d2e` strip across the top carrying the section heading in white uppercase. The labels above the income and essentials figures use dark green `#0a3d2e` (mid green fails contrast on the light green panel). Yellow `#ffe42d` is reserved for a single optional highlight bar behind the active state of the difference label, used sparingly so it retains impact.
 
 ### 7.3 Number formatting
 
@@ -302,13 +306,19 @@ The threshold figure is filled from `benefitCap.earningsThreshold`. The note is 
 
 ## 8. Footer
 
-Below the calculator, three paragraphs.
+Below the calculator, five short paragraphs and a sources line.
 
-> This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC's housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn't risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. Almost half of UC households (47% in May 2026) have money taken off their payment to repay advance loans or other debts, usually up to 15% of the standard rate.
+> This shows how far the basic amount of Universal Credit has to stretch each week, leaving out rent and council tax. UC and Council Tax Reduction help with these, but often don't cover the full cost. In Bristol, the most UC pays towards rent hasn't gone up since April 2024. That means many households pay part of their rent or council tax from the money shown here.
 >
-> It covers the standard allowance and child element only, and applies the benefit cap for outside London. It does not include the LCWRA addition, carer element, disabled child addition, Personal Independence Payment, DLA, Child Benefit, or the housing and childcare elements of UC. Child Benefit is not counted as income here, but it is counted towards the benefit cap. If anyone in your household gets a disability or carer benefit, the cap usually does not apply. If any of these apply, your actual UC and support costs may differ. Some households get other help that lowers their costs: free school meals for every child in a household on UC, the £150 Warm Home Discount on energy bills, and Healthy Start payments for some families with a child under 4. For a personal benefits check, contact Citizens Advice or your local advice service. North Bristol & South Gloucestershire Foodbank is not a qualified benefits adviser. This tool is for awareness and campaigning only.
+> Almost half of households on UC (47% in May 2026) also have money taken off their payment to repay debts, usually up to 15% of the basic amount.
 >
-> Costs reflect April 2026 prices for Bristol and South Gloucestershire, at a realistic low-budget level. Data: Ofgem (April 2026 price cap), DWP UC rates and benefit cap April 2026, HMRC Child Benefit rates April 2026, First Bus fares January 2026, Bristol Water and Wessex Water 2026/27, retailer pricing March 2026, TV Licensing April 2026.
+> It includes the basic amount and the child element only. It leaves out other parts of UC, disability and carer benefits such as PIP and DLA, and Child Benefit. It applies the benefit cap for outside London, counting Child Benefit but not help with rent, so for renters the cap may apply sooner. The cap usually doesn't apply if someone gets a disability or carer benefit.
+>
+> Every child in a family on UC can get free school meals, and some households can get the £150 Warm Home Discount or Healthy Start.
+>
+> For advice about your own situation, contact Citizens Advice or your local advice service. North Bristol & South Gloucestershire Foodbank isn't a benefits adviser. This is an illustration to raise awareness, not a benefits calculator.
+>
+> Costs are April 2026 prices for Bristol and South Gloucestershire, at a realistic low-budget level. Sources: DWP UC rates and benefit cap, HMRC Child Benefit and TV Licensing (April 2026), Ofgem price cap (April 2026), Bristol Water and Wessex Water (2026/27), First Bus fares (January 2026), retailer prices (March 2026).
 
 Facts in this copy that change over time, and must be checked at each review: the LHA freeze (still frozen for 2026/27), the deductions share and cap (DWP deductions statistics), the Warm Home Discount amount, free school meals eligibility, and Healthy Start eligibility.
 
@@ -332,7 +342,7 @@ Facts in this copy that change over time, and must be checked at each review: th
 - `inCouple`: shown only if `numAdults` is 2 or more.
 - `adults[i].monthlyEarnings`: shown only if that adult is working. The value is kept in state if the adult stops working, but not used.
 - `childAges[]`: one row per child.
-- Any basket row whose value is £0 is hidden (in practice, school uniform when there are no children aged 5 to 15).
+- A basket row is hidden only when the item would cost £0 even if ticked (in practice, school uniform when there are no children aged 5 to 15). Unticked rows stay visible, struck through.
 - Benefit cap note: shown only when the cap applies (§7.4).
 
 ### 9.4 Keyboard and tab order
@@ -356,6 +366,7 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 | `numAdults` drops from 2 to 1 | Last adult row removed; `inCouple` cleared. |
 | Adult stops working after entering earnings | Earnings field hides. Value kept in state but not used. Reappears if re-ticked. |
 | All children removed | School uniform row hides. |
+| Basket item unticked | Row stays, cost struck through; the item drops out of the essentials total. |
 | Income exactly equals essentials | £0.00 with the "Exactly enough" copy in §7.2. |
 | Benefit cap applies | Income reflects the capped UC; the cap note appears (§7.4). |
 
@@ -430,12 +441,12 @@ All with every basket item ticked. Income and essentials per week.
 | 4 | Single parent 25+, 1 child 5 to 15, no work | £168.19 | £171.46 | Shortfall £3.27 | |
 | 5 | Couple 25+, 2 children (1 under 5, 1 aged 5 to 15), no work | £294.20 | £248.46 | £45.74 left | |
 | 6 | Two adults 25+, not a couple, no work | £196.11 | £171.46 | £24.65 left | Each adult is a separate single claimant. |
-| 7 | Single 25+, working, £1,200/month | £276.92 | £129.46 | £147.46 left | No work allowance without children. £1,200 × 0.55 = £660 exceeds £424.90, so UC is £0. |
-| 8 | Single parent 25+, 1 child 5 to 15, working, £1,200/month | £382.92 | £183.46 | £199.46 left | Work allowance £710. Excess £490 × 0.55 = £269.50. UC = £728.84 − £269.50 = £459.34. |
-| 9 | Couple 25+, both working, £750/month each, no children | £346.15 | £195.46 | £150.69 left | No work allowance. £1,500 × 0.55 = £825 exceeds £666.97, so UC is £0. |
+| 7 | Single 25+, working, £1,200/month | £276.92 | £135.46 | £141.46 left | No work allowance without children. £1,200 × 0.55 = £660 exceeds £424.90, so UC is £0. |
+| 8 | Single parent 25+, 1 child 5 to 15, working, £1,200/month | £382.92 | £189.46 | £193.46 left | Work allowance £710. Excess £490 × 0.55 = £269.50. UC = £728.84 − £269.50 = £459.34. |
+| 9 | Couple 25+, both working, £750/month each, no children | £346.15 | £207.46 | £138.69 left | No work allowance. £1,500 × 0.55 = £825 exceeds £666.97, so UC is £0. |
 | 10 | Couple 25+, 3 children 5 to 15, no work | £360.61 | £309.46 | £51.15 left | Capped. Max UC £1,578.79; limit £1,835 − Child Benefit £272.35 = £1,562.65. |
 | 11 | Single parent 25+, 4 children 5 to 15, no work | £342.71 | £309.46 | £33.25 left | Capped. Max UC £1,640.66; limit £1,835 − Child Benefit £349.92 = £1,485.08. |
-| 12 | As 10, but one adult working, £881/month | £545.94 | £321.46 | £224.48 left | Earnings at the threshold, so the cap does not apply. |
+| 12 | As 10, but one adult working, £881/month | £545.94 | £327.46 | £218.48 left | Earnings at the threshold, so the cap does not apply. |
 | 13 | All basket items unticked | Income unchanged | £0.00 | Equals income | Empty-basket message. |
 
 The automated tests in `tests/` cover these calculations.
@@ -447,7 +458,7 @@ The automated tests in `tests/` cover these calculations.
 - Saving or sharing a result.
 - LCWRA element, carer element, disabled child addition.
 - Childcare element of UC.
-- Housing element of UC and LHA shortfall.
+- Housing element of UC, Local Housing Allowance, and the benefit cap including housing. Results say they're before rent and council tax instead (§7.2).
 - Council Tax Reduction.
 - PIP, DLA, Carer's Allowance, and Child Benefit as income.
 - London benefit cap rates, the benefit cap grace period, and exemptions for disability and carer benefits.
@@ -468,4 +479,7 @@ The automated tests in `tests/` cover these calculations.
 - Benefit cap: modelled for outside London, with Child Benefit counted towards it.
 - Other help that lowers costs is mentioned in the footer, not deducted, so the basket stays the gross cost of essentials.
 - Costs stay on an April basis between annual reviews.
+- Audience: a "could you survive on UC?" tool for people who don't get UC. Visitors enter their own household, so the questions speak to "you" on purpose; don't reword them as an example household (decided 23rd September 2026).
+- Housing: the basket excludes rent and council tax, matching Trussell's framing, and every result says it's before rent and council tax. There is no rent input, since visitors wouldn't know what a household on UC pays towards rent (decided 23rd September 2026).
+- Modelling simplifications (higher work allowance only, Child Benefit not counted as income, no pre-April-2017 first-child rate) are kept. The tool is an illustration, not a benefits calculator, and the footer says so (decided 23rd September 2026).
 - JavaScript-disabled fallback: a static paragraph stating the headline figure (£98.05/week for a single adult, April 2026) and a link to Trussell's Guarantee Our Essentials page.

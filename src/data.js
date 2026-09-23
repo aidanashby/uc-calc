@@ -44,7 +44,7 @@ const COSTS = {
     flat: 5,
   },
   travel: {
-    workingAdult:    22,
+    workingAdult:    28,
     nonWorkingAdult: 10,
     child5to15:      4,
   },

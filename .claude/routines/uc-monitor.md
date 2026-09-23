@@ -52,7 +52,7 @@ All costs are on an **April basis** and are updated once a year. Do not recommen
 |---|---|---|---|
 | Energy | `energy_1` to `energy_8` | March and April runs | Ofgem cap for April to June (announced late February). Scale the brackets by the change in the typical direct debit dual fuel annual bill on a like-for-like basis and round to whole pounds. |
 | Water | `water_1` to `water_8` | March and April runs | Bristol Water and Wessex Water metered charges for the new charging year (published February). |
-| Travel | `travel_working`, `travel_nonWorking`, `travel_child5to15` | January, April and September runs | First Bus Bristol, Bath and the West weekly and single fares; the national £3 single fare cap (currently to March 2027); the West of England £1 child fare. |
+| Travel | `travel_working`, `travel_nonWorking`, `travel_child5to15` | January, April and September runs | First Bus Bristol, Bath and the West fares: `travel_working` is the FirstWeek ticket for the Bristol zone (£28 from 4th January 2026). Also the national single fare cap (£3 to 31st December 2026, £2 from 1st January 2027, gov.uk) and the West of England £1 child fare. |
 | TV licence | `tvLicence_flat` | March and April runs | Colour licence fee from 1st April. Weekly value = annual ÷ 52, to 2 decimals. |
 | Mobile, broadband | `mobile_perAdult`, `broadband_flat` | April run | Ofcom's April price rises and social tariff prices. Recommend a change only if a typical low-cost SIM-only plan or social tariff has moved by £1 a week or more. |
 | School uniform | `schoolUniform_perChild` | September run | Rules limiting branded uniform items in England. |
@@ -62,13 +62,13 @@ All costs are on an **April basis** and are updated once a year. Do not recommen
 
 Check every run. The text is in `inc/shortcode.php` and `uc-calc.php`, mirrored in spec §7.4 and §8.
 
-- Local Housing Allowance: the footer says it "hasn't risen since April 2024". Wrong as soon as LHA rates are raised.
-- Deductions: "Almost half of UC households (47% in May 2026) … usually up to 15% of the standard rate". Check the latest DWP UC deductions statistics and the Fair Repayment Rate cap.
+- Local Housing Allowance: the footer says "In Bristol, the most UC pays towards rent hasn't gone up since April 2024". Wrong as soon as LHA rates are raised.
+- Deductions: "Almost half of households on UC (47% in May 2026) … usually up to 15% of the basic amount". Check the latest DWP UC deductions statistics and the Fair Repayment Rate cap.
 - Warm Home Discount: £150, and whether households on UC still qualify.
-- Free school meals: every child in a household on UC in England (from September 2026).
+- Free school meals: "Every child in a family on UC can get free school meals" (England, from September 2026).
 - Healthy Start: families with a child under 4, and the earnings limit.
 - The benefit cap note's threshold figure comes from the settings, so only the wording needs checking.
-- Dates: the sources line in the footer, the energy, water, clothing and TV licence info text, and the no-JavaScript fallback ("in April 2026 … £98.05").
+- Dates: the sources line in the footer, the energy, water, clothing, travel, school uniform and TV licence info text, and the no-JavaScript fallback ("in April 2026 … £98.05").
 - Placeholder figures in `inc/shortcode.php` (£98.05, £117.46, £19.41) must equal QA scenario 1 in spec §13.
 
 ## 4. How to research

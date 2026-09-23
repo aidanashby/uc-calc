@@ -261,16 +261,17 @@ function updateBasketRows(s, costs) {
     const nameEl = rowEl ? rowEl.querySelector('.uc-calc__basket-name') : null;
     const isOn   = s.basket[key];
 
-    if (costEl) costEl.textContent = formatCurrency(costs[key]);
+    if (costEl) costEl.textContent = formatCurrency(costs.raw[key]);
 
     if (check && nameEl) {
       const template = isOn ? I18N.basketAriaIncluded : I18N.basketAriaExcluded;
-      check.setAttribute('aria-label', format(template, nameEl.textContent, formatCurrency(costs[key])));
+      check.setAttribute('aria-label', format(template, nameEl.textContent, formatCurrency(costs.raw[key])));
     }
 
     if (rowEl) {
       rowEl.classList.toggle('uc-calc__basket-row--unchecked', !isOn);
-      rowEl.hidden = costs[key] === 0;
+      // Hide only items that don't apply; unticked items stay, struck through.
+      rowEl.hidden = costs.raw[key] === 0;
     }
   });
 }
@@ -408,9 +409,13 @@ function handleFormChange(e) {
   }
 }
 
+function isEarningsInput(name) {
+  return !!name && name.startsWith('adultEarnings_');
+}
+
 function handleEarningsInput(e) {
   const { name } = e.target;
-  if (!name || !name.startsWith('adultEarnings_')) return;
+  if (!isEarningsInput(name)) return;
   const i = parseInt(name.slice(14), 10);
   if (state.adults[i]) state.adults[i].monthlyEarnings = parseFloat(e.target.value) || 0;
   render(state);
@@ -532,13 +537,13 @@ function init() {
   if (!form) return;
 
   form.addEventListener('change', e => {
-    if (e.target.name && e.target.name.startsWith('adultEarnings_')) return;
+    if (isEarningsInput(e.target.name)) return;
     handleFormChange(e);
     render(state);
   });
 
   form.addEventListener('input', e => {
-    if (!e.target.name || !e.target.name.startsWith('adultEarnings_')) return;
+    if (!isEarningsInput(e.target.name)) return;
     debouncedEarnings(e);
   });
 
