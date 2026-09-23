@@ -7,7 +7,6 @@ All notable changes to UC Calculator. Dates are release dates.
 ### Changed
 - Desktop layout (981px and up, Divi's desktop breakpoint) has three columns: household, essentials, and the result at the top of the third. Tablet and phone still stack them. On small desktop screens, income and essentials stack inside the result panel so the figures fit.
 - On desktop with a mouse, each essential's ⓘ explanation opens as an overlay on hover. It stays open while you move onto it, stays open if you click, and closes with Escape or a click elsewhere. Tablet and phone keep tap-to-open below the row.
-
 - Footer: deductions figure updated to 47% of UC households in May 2026 (DWP deductions statistics, published 18th August 2026).
 - School uniform info text names the legal limit on branded items in force since September 2026: 3 items, or 4 at secondary school if one is a tie.
 
