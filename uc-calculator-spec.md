@@ -23,7 +23,7 @@ The calculator follows the Trussell / JRF "Guarantee Our Essentials" framing. It
 | Server calls | None. No fetch / XHR / WebSocket. All state, calculation, and UI in the browser. |
 | Persistence | None by default. State lives in memory only. Cleared on navigation or reload. No localStorage, sessionStorage, cookies, or query strings written. |
 | Analytics | None on this plugin. WordPress site analytics elsewhere are unaffected. |
-| Bundled data | UC rates, cost values, and scaling rules live in a single JavaScript object inside the plugin. Editable by the site admin via a constants file. No external CMS field for v1. |
+| Bundled data | UC rates, cost values, and scaling rules ship as defaults in the plugin (`uc_calc_defaults()` in `uc-calc.php`, mirrored in `src/data.js`). The site admin can override any value on the Settings → UC Calculator page. |
 | Browser support | Modern evergreen browsers, last 2 versions. iOS Safari 15+. No IE. |
 | Page weight | Lightweight: vanilla JS or a small framework. No heavy libraries. Total payload under 50KB if possible. |
 | Mobile | Responsive, mobile-first. Tested at 360px, 768px, 1024px, 1440px widths. |
@@ -61,227 +61,179 @@ Live update: every input change in section A or B triggers immediate recalculati
 
 ## 4. Section A: Household composition (inputs)
 
-All fields are required unless flagged optional. Defaults shown in parentheses.
+All fields are required. Defaults shown in parentheses.
 
 | Field | Type | Options / Range | Default | Notes |
 |---|---|---|---|---|
-| `numAdults` | radio / segmented | 1, 2 | 1 | Drives whether second adult fields show. |
-| `adult1Age` | radio | "Under 25", "25 or over" | "25 or over" | |
-| `adult2Age` | radio | "Under 25", "25 or over" | "25 or over" | Hidden if `numAdults` is 1. |
-| `numChildren` | stepper | 0 to 8 | 0 | Hard cap at 8 to keep UI sane. |
-| `childAges[]` | radio per child | "Under 5", "5 to 15" | "5 to 15" | One row per child. Render dynamically. |
-| `adult1Working` | checkbox | true / false | false | "Adult 1 is in paid work." |
-| `adult2Working` | checkbox | true / false | false | Hidden if `numAdults` is 1. "Adult 2 is in paid work." |
-| `monthlyEarnings` | number input | £ per month, 2 decimals, 0 to 5000 | empty | Combined household net (take-home) pay. Hidden unless at least one adult is working. `step="0.01"`. |
-| `lcwra` | checkbox | true / false | false | "Limited capability for work and work-related activity due to a long-term health condition or disability." Plain language tooltip explains. |
-| `lcwraPre2026` | checkbox | true / false | false | Hidden unless `lcwra` is true. Wording: "This was confirmed before April 2026." |
-| `carer` | checkbox | true / false | false | Wording: "I care for a disabled adult or child for 35 hours or more a week (and I'm not paid for it)." |
-| `disabledChild` | checkbox | true / false | false | Hidden if `numChildren` is 0. |
-| `disabledChildHigher` | checkbox | true / false | false | Hidden unless `disabledChild` is true. Wording: "Receives the highest rate of DLA care or enhanced PIP daily living." |
+| `numAdults` | stepper | 1 to 6 | 1 | Label: "Number of adults". One adult row per adult, rendered dynamically. |
+| `inCouple` | checkbox | true / false | false | Shown only if `numAdults` is 2 or more. Wording: "Two of us are in a couple or civil partnership." Cleared if `numAdults` drops below 2. |
+| `adults[i].age` | radio per adult | "Under 25", "25 or over" | "25 or over" | Legend: "How old are you?" for the first adult, "How old are they?" for the others. |
+| `adults[i].working` | checkbox per adult | true / false | false | Wording: "I am currently in work" (first adult), "Currently in work" (others). |
+| `adults[i].monthlyEarnings` | number input per adult | £ per month, 2 decimals, 0 to 20,000 | empty | Net (take-home) pay. Shown only if that adult is working. Hint under the first adult's field: "Net (take-home) pay after tax and National Insurance." |
+| `numChildren` | stepper | 0 to 8 | 0 | Label: "Dependent children under 16". |
+| `childAges[]` | radio per child | "Under 5", "5 to 15" | "5 to 15" | One row per child. Legend: "How old is your first child?" and so on. |
 
-PIP itself is not in scope. The calculator is explicit on this in a footnote: *"This calculator covers Universal Credit only. It doesn't include Personal Independence Payment, which is a separate benefit and isn't reduced by UC."*
+The calculator covers Universal Credit only. It has no inputs for disability, caring, or other benefits. The footer says so (see §8).
 
 ---
 
-## 5. UC entitlement calculation (April 2026 rates)
+## 5. UC entitlement calculation (2026/27 rates)
 
-All UC components are in monthly figures, then converted to weekly at the end.
+All UC figures are monthly and converted to weekly at the end.
 
-### 5.1 Constants (single source of truth, editable)
+### 5.1 Constants (defaults, admin-editable)
 
 ```js
-const UC_RATES_2026 = {
+const UC_RATES = {
   // Standard allowance, monthly £
   standardAllowance: {
-    singleUnder25: 338.58,
-    single25Plus: 424.90,
+    singleUnder25:     338.58,
+    single25Plus:      424.90,
     coupleBothUnder25: 528.34,
-    coupleAny25Plus: 666.97
+    coupleAny25Plus:   666.97,
   },
-  // Child element, monthly £ per child
-  childElement: 303.94,           // simplified: post-April-2017 rate for all children
-  // Disabled child addition, monthly £
-  disabledChildLower: 164.79,
-  disabledChildHigher: 514.71,
-  // LCWRA element, monthly £
-  lcwraNew: 217.26,               // claimants from April 2026 onwards
-  lcwraPre2026: 429.80,           // pre-April-2026 claimants, severe conditions, or terminally ill
-  // Carer element, monthly £
-  carerElement: 209.34,
-  // Earnings taper
-  workAllowanceNoHousing: 710,    // higher rate, no housing element in calc
-                                  // ELIGIBILITY: only applies if the claimant has at least
-                                  // one dependent child OR has LCWRA. Childless, non-disabled
-                                  // working claimants have no work allowance and the taper
-                                  // applies from the first £1 earned.
-  taperRate: 0.55                 // 55p reduction per £1 above work allowance
+  childElement:           303.94, // monthly £ per child
+  workAllowanceNoHousing: 710,    // higher work allowance, monthly £
+  taperRate:              0.55,   // 55p reduction per £1 above the work allowance
+  // Benefit cap outside London, monthly £
+  benefitCap: {
+    family:            1835,     // couples, and single people with children
+    single:            1229.42,  // single people without children
+    earningsThreshold: 881,      // take-home pay at or above this exempts the household
+  },
+  // Child Benefit, weekly £. Not counted as income; counts towards the benefit cap.
+  childBenefit: {
+    eldest:     27.05,
+    additional: 17.90,
+  },
 };
 ```
 
-All figures sourced from the gov.uk Benefit and pension rates 2026/2027 document.
+Sources: DWP Benefit and pension rates 2026 to 2027 (UC, benefit cap), HMRC Child Benefit rates 2026 to 2027. The benefit cap is frozen at its 2025/26 level for 2026/27; the earnings threshold rose from £846 to £881 on 1 April 2026.
 
-The two-child limit was removed in April 2026, so all children get the child element.
+The two-child limit no longer applies for assessment periods starting on or after 6 April 2026, so every child gets the child element.
 
-The pre-2017 first-child rate (£351.88) is not applied. Documented as a deliberate simplification: *"Children born before 6 April 2017 receive a slightly higher rate. We've used the standard rate for simplicity."*
+The higher first-child rate for children born before 6 April 2017 (£351.88) is not applied. This is a deliberate simplification.
 
-### 5.2 Calculation pseudocode
+The same values live in two places, which must be kept in step: `uc_calc_defaults()` in `uc-calc.php` (the live defaults) and `src/data.js` (the JS fallback and the tests).
+
+### 5.2 Benefit units
+
+- If `inCouple` is true: adults 1 and 2 form one couple benefit unit, and all children belong to it. Adults 3 and above are each a separate single claimant with no children.
+- Otherwise: every adult is a separate single claimant. All children belong to adult 1, who is treated as a single parent.
+
+### 5.3 Calculation per benefit unit
 
 ```
-function calculateUC(input):
+function calculateUnit(unit):
   // Standard allowance
-  if input.numAdults == 1:
-    if input.adult1Age == "25_plus": SA = singleUnder25Plus
-    else: SA = singleUnder25
+  if unit is a couple:
+    SA = coupleAny25Plus if either adult is "25plus" else coupleBothUnder25
   else:
-    if input.adult1Age == "25_plus" OR input.adult2Age == "25_plus":
-      SA = coupleAny25Plus
-    else:
-      SA = coupleBothUnder25
+    SA = single25Plus if adult is "25plus" else singleUnder25
 
-  // Child element (no two-child limit)
-  CE = input.numChildren × childElement
+  maxUC    = SA + unit.numChildren × childElement
+  earnings = sum of monthlyEarnings for working adults in the unit
 
-  // Disabled child addition
-  if input.disabledChild:
-    DCA = disabledChildHigher if input.disabledChildHigher else disabledChildLower
-  else:
-    DCA = 0
+  // Earnings taper. Work allowance applies only if the unit has children.
+  workAllowance = workAllowanceNoHousing if unit.numChildren > 0 else 0
+  netUC = max(0, maxUC - max(0, earnings - workAllowance) × taperRate)
 
-  // LCWRA
-  if input.lcwra:
-    LCWRA = lcwraPre2026 if input.lcwraPre2026 else lcwraNew
-  else:
-    LCWRA = 0
+  // Benefit cap
+  isFamily = unit is a couple OR unit.numChildren > 0
+  if earnings < benefitCap.earningsThreshold:
+    childBenefit = 0 if unit.numChildren == 0
+                   else (eldest + (numChildren - 1) × additional) × 52 / 12
+    limit = (benefitCap.family if isFamily else benefitCap.single) - childBenefit
+    if netUC > limit:
+      netUC  = max(0, limit)
+      capped = true
 
-  // Carer
-  CARER = carerElement if input.carer else 0
+  return netUC + earnings
 
-  // Maximum UC entitlement (monthly)
-  maxUC = SA + CE + DCA + LCWRA + CARER
-
-  // Earnings taper
-  // Work allowance only applies if there's a dependent child or LCWRA in the household.
-  // Otherwise the taper hits from £1 earned.
-  if (input.adult1Working OR (input.numAdults == 2 AND input.adult2Working)) AND input.monthlyEarnings > 0:
-    if input.numChildren > 0 OR input.lcwra:
-      workAllowance = workAllowanceNoHousing
-    else:
-      workAllowance = 0
-    excess = max(0, input.monthlyEarnings - workAllowance)
-    reduction = excess × taperRate
-    netUC = max(0, maxUC - reduction)
-    monthlyIncome = netUC + input.monthlyEarnings
-  else:
-    netUC = maxUC
-    monthlyIncome = maxUC
-
-  // Convert to weekly
-  weeklyIncome = monthlyIncome × 12 / 52
-
-  return weeklyIncome rounded to 2 decimals
+weeklyIncome = (sum of calculateUnit over all units) × 12 / 52
 ```
 
-### 5.3 Edge cases and notes
+With 2026/27 rates the cap first applies, with no earnings, to a couple with 3 children and to a single parent with 4 children.
 
-- **Benefit cap**: not modelled in v1. Most scenarios for our audience won't hit it. Documented as a limitation.
-- **Childcare element**: not modelled. Out of scope.
+### 5.4 Limitations
+
+- **Benefit cap**: modelled for outside London only. The calculator ignores the housing element, so a real household paying rent reaches the cap sooner and loses more. The nine-month grace period after work ends and the exemptions for disability and carer benefits are not modelled; the footer and the cap note explain them.
+- **Childcare element**: not modelled.
 - **Housing element**: not modelled. Excluded by design.
-- **Benefit deductions** (advance repayments, court fines, child maintenance arrears, rent arrears): can take up to 25% off the standard allowance for many UC claimants. Mentioned in the footnote, not modelled. *"For around 1 in 4 UC claimants, deductions for advance loans or other debts reduce the standard rate by up to 25% before they receive it."*
-- If `numAdults` changes from 2 to 1, drop `adult2Age` from the calculation. If `numChildren` decreases, truncate `childAges` array.
+- **Deductions** (advance repayments, debts to DWP, third-party debts): not modelled. Usually capped at 15% of the standard allowance since April 2025. Mentioned in the footer.
+- **Other help that lowers costs** (free school meals for every child in a UC household in England from September 2026, the £150 Warm Home Discount, Healthy Start): mentioned in the footer, not deducted from the basket.
 
 ---
 
 ## 6. Section B: Essentials basket
 
-11 line items. All ticked by default. Unticking strikes through and greys the row, removes it from the total, and triggers a result recalculation.
+12 line items. All ticked by default. Unticking strikes through and greys the row, removes it from the total, and triggers a result recalculation.
 
 ### 6.1 Display
 
-Each row shows: checkbox + plain English label + calculated weekly £ value + small info icon (tooltip explaining how it was calculated). On mobile, the row collapses to two lines.
+Each row shows: checkbox + plain English label + calculated weekly £ value + info button that opens a short explanation of how it was calculated. A row is hidden when its value is £0 (for example, school uniform when there are no children aged 5 to 15).
 
-```
-[✓] Food                                     £140
-    Based on Aldi-priced budget for 2 adults
-    and 2 children
-```
+### 6.2 Cost values (April 2026 prices, Bristol and South Glos averaged)
 
-### 6.2 Cost values and scaling rules (April 2026 prices, Bristol and South Glos averaged)
-
-All values £ per week. These live in a single object, so they can be tuned without touching logic.
+All values £ per week. Defaults live in the same two places as the UC rates and are admin-editable.
 
 ```js
-const COSTS_2026 = {
+const COSTS = {
   food: {
-    firstAdult: 50,
-    additionalAdult: 35,
-    childUnder5: 22,
-    child5to15: 30
+    firstAdult:      35,
+    additionalAdult: 15,
+    childUnder5:     15,
+    child5to15:      20,
   },
   energy: {
-    // Bracket on total household size (adults + children)
-    bracket: { 1: 25, 2: 30, 3: 38, 4: 38, 5: 45, 6: 45, 7: 45, 8: 45 }
-    // Reflects single in flat at low end through to family in 3-bed at top end.
-    // Includes a small premium over Ofgem direct-debit benchmark to reflect
-    // the prepayment-meter cost penalty common among UC claimants.
+    // By household size. Ofgem April 2026 cap plus a small prepayment-meter premium.
+    bracket: { 1: 25, 2: 30, 3: 38, 4: 38, 5: 45, 6: 45, 7: 45, 8: 45 },
   },
   water: {
-    // Bristol Water + Wessex sewerage on a meter, per total household size
-    bracket: { 1: 6, 2: 9, 3: 11, 4: 13, 5: 15, 6: 15, 7: 15, 8: 15 }
+    // Bristol Water + Wessex Water sewerage on a meter, by household size
+    bracket: { 1: 6, 2: 9, 3: 11, 4: 13, 5: 15, 6: 15, 7: 15, 8: 15 },
   },
-  mobile: {
-    perAdult: 4   // basic SIM-only, mid-market (£17/month average)
-  },
-  broadband: {
-    flat: 5       // £20/month average; social tariffs available cheaper
-  },
+  mobile:        { perAdult: 4 },
+  broadband:     { flat: 5 },
   travel: {
-    workingAdult: 22,       // weekly bus pass equivalent, allowing for some skipped days
-    nonWorkingAdult: 10,    // ad-hoc essential trips
-    child5to15: 4,
-    childUnder5: 0          // free under 5
+    workingAdult:    22,  // weekly bus pass equivalent
+    nonWorkingAdult: 10,  // ad-hoc essential trips
+    child5to15:      4,   // under 5s travel free
   },
-  toiletries: {
-    perPerson: 5,           // includes period products
-    householdBase: 2        // shared items (toilet roll, etc)
-  },
-  cleaning: {
-    flat: 4
-  },
-  clothes: {
-    perAdult: 5,
-    childUnder5: 6,         // grow fastest, replaced most often
-    child5to15: 4           // school uniform tracked separately
-  },
-  schoolUniform: {
-    perChild5to15: 6        // £312/year averaged primary and secondary, statutory branded-item cap in force
-  },
-  tvLicence: {
-    flat: 3.46              // £180/year colour licence, from 1 April 2026
-  }
+  toiletries:    { perPerson: 5, householdBase: 2 },
+  cleaning:      { flat: 4 },
+  clothes:       { perAdult: 5, childUnder5: 6, child5to15: 4 },
+  schoolUniform: { perChild5to15: 6 },
+  tvLicence:     { flat: 3.46 },  // £180 a year from 1 April 2026
+  sundries:      { single: 13, household: 20 },
 };
 ```
 
+All costs use an April basis and are reviewed once a year. The quarterly Ofgem cap changes in July, October and January are not applied between reviews.
+
 ### 6.3 Per-item formulas
 
-| Item | Default | Formula | Hide row if |
-|---|---|---|---|
-| Food | on | `firstAdult + additionalAdult × (numAdults - 1) + childUnder5 × numUnder5 + child5to15 × num5to15` | never |
-| Energy | on | Look up `bracket[householdSize]` where `householdSize = min(numAdults + numChildren, 8)` | never |
-| Water | on | Look up `bracket[householdSize]` | never |
-| Mobile | on | `perAdult × numAdults` | never |
-| Broadband | on | `flat` | never |
-| Travel (bus) | on | `(workingAdult if adult1Working else nonWorkingAdult) + (workingAdult if adult2Working else nonWorkingAdult, if numAdults == 2) + child5to15 × num5to15` | never |
-| Toiletries & period products | on | `perPerson × (numAdults + numChildren) + householdBase` | never |
-| Cleaning products | on | `flat` | never |
-| Clothes (everyday) | on | `perAdult × numAdults + childUnder5 × numUnder5 + child5to15 × num5to15` | never |
-| School uniform & shoes | on | `perChild5to15 × num5to15` | `num5to15 == 0` |
-| TV licence | on | `flat` | never |
+`householdSize = min(numAdults + numChildren, 8)`.
 
-The travel formula now reads each adult's working flag independently. A two-earner household correctly applies the working travel rate twice; a single-earner couple applies it once. Children under 5 travel free in Bristol so contribute zero.
+| Item | Formula | Hidden when |
+|---|---|---|
+| Food | `firstAdult + additionalAdult × (numAdults - 1) + childUnder5 × numUnder5 + child5to15 × num5to15` | never |
+| Energy (gas and electric) | `energy.bracket[householdSize]` | never |
+| Water | `water.bracket[householdSize]` | never |
+| Mobile phones | `perAdult × numAdults` | never |
+| Home broadband | `flat` | never |
+| Travel (bus) | for each adult, `workingAdult` if working else `nonWorkingAdult`; plus `child5to15 × num5to15` | never |
+| Toiletries and period products | `perPerson × (numAdults + numChildren) + householdBase` | never |
+| Cleaning products | `flat` | never |
+| Everyday clothing | `perAdult × numAdults + childUnder5 × numUnder5 + child5to15 × num5to15` | never |
+| School uniform and shoes | `perChild5to15 × num5to15` | `num5to15 == 0` |
+| Sundries | `single` if `householdSize == 1` else `household` | never |
+| TV licence | `flat` | never |
 
-### 6.4 Cost data caveat displayed beneath the basket
+### 6.4 Dated copy in the basket
 
-> Costs reflect April 2026 prices for Bristol and South Gloucestershire, drawn from Ofgem (energy), Bristol Water and Wessex Water (water), First Bus (travel), retailer pricing for food, clothing and household goods, and government rates for the TV licence. Figures show a realistic low budget, not the bare minimum.
+The info text for energy (April 2026 price cap), water (2026/27), clothing (March 2026 pricing) and TV licence (£180 from 1 April 2026) names its source date. Update it whenever the matching figure changes.
 
 ---
 
@@ -300,6 +252,7 @@ Three figures and a short message, updated on every input change. No "calculate"
 │ DIFFERENCE                                  │
 │ £xxx.xx                                     │
 │ [contextual line - see 7.2]                 │
+│ [benefit cap note, if capped - see 7.4]     │
 └─────────────────────────────────────────────┘
 ```
 
@@ -335,17 +288,27 @@ Headline figures (income, essentials, difference) sit in a result panel with a s
 - Use thin space or comma for thousands (none expected at weekly scale).
 - Negative values shown without a minus, instead labelled "Shortfall" so the figure reads "Shortfall: £21.41" rather than "-£21.41". Avoids the accounting convention which can be unclear at a glance.
 
+### 7.4 Benefit cap note
+
+When the benefit cap reduces any benefit unit's UC, a note appears beneath the subtext, separated by a thin rule:
+
+> The benefit cap has lowered the UC shown here. The cap doesn't apply if your household takes home at least £881.00 a month from work, or if someone gets certain disability or carer benefits.
+
+The threshold figure is filled from `benefitCap.earningsThreshold`. The note is hidden otherwise.
+
 ---
 
-## 8. Bottom note
+## 8. Footer
 
-Below the result panel, a short paragraph (admin-editable via a single shortcode attribute or constants file):
+Below the calculator, three paragraphs.
 
-> This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC's housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn't risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. For around 1 in 4 UC claimants, deductions for advance loans or other debts reduce the standard rate by up to 25% before it reaches them.
+> This calculator shows what the basic rate of Universal Credit has to stretch across, after rent and council tax. UC's housing element helps with rent up to a capped amount called Local Housing Allowance, which in Bristol hasn't risen since April 2024 even as rents have. Council tax is handled separately through Council Tax Reduction. Many people end up topping up rent or council tax from the same standard rate this calculator looks at. Almost half of UC households (46% in February 2026) have money taken off their payment to repay advance loans or other debts, usually up to 15% of the standard rate.
 >
-> North Bristol & South Gloucestershire Foodbank is not a qualified benefits or financial advisor. This tool is for awareness and campaigning. It should not be used to plan a household budget or as a substitute for advice. For a personal benefits check, contact Citizens Advice or your local advice service.
+> It covers the standard allowance and child element only, and applies the benefit cap for outside London. It does not include the LCWRA addition, carer element, disabled child addition, Personal Independence Payment, DLA, Child Benefit, or the housing and childcare elements of UC. Child Benefit is not counted as income here, but it is counted towards the benefit cap. If anyone in your household gets a disability or carer benefit, the cap usually does not apply. If any of these apply, your actual UC and support costs may differ. Some households get other help that lowers their costs: free school meals for every child in a household on UC, the £150 Warm Home Discount on energy bills, and Healthy Start payments for some families with a child under 4. For a personal benefits check, contact Citizens Advice or your local advice service. North Bristol & South Gloucestershire Foodbank is not a qualified benefits adviser. This tool is for awareness and campaigning only.
+>
+> Costs reflect April 2026 prices for Bristol and South Gloucestershire, at a realistic low-budget level. Data: Ofgem (April 2026 price cap), DWP UC rates and benefit cap April 2026, HMRC Child Benefit rates April 2026, First Bus fares January 2026, Bristol Water and Wessex Water 2026/27, retailer pricing March 2026, TV Licensing April 2026.
 
-Followed by a sources line: *"Data: Ofgem (April 2026 price cap), DWP UC rates April 2026, First Bus fares January 2026, Bristol Water and Wessex Water 2026/27, retailer pricing March 2026, TV Licensing April 2026."*
+Facts in this copy that change over time, and must be checked at each review: the LHA freeze (still frozen for 2026/27), the deductions share and cap (DWP deductions statistics), the Warm Home Discount amount, free school meals eligibility, and Healthy Start eligibility.
 
 ---
 
@@ -353,26 +316,22 @@ Followed by a sources line: *"Data: Ofgem (April 2026 price cap), DWP UC rates A
 
 ### 9.1 Live update
 
-- Every input change in Section A or B triggers a recalculation function within the same tick.
-- No debouncing on text inputs (only one numeric input, `monthlyEarnings`). On mobile keyboards, the recalc happens on each digit. If this causes flicker, debounce earnings input at 200ms.
+- Every input change triggers a recalculation within the same tick.
+- Earnings inputs are debounced at 200ms.
 
 ### 9.2 Validation
 
-- `monthlyEarnings`: positive number to 2 decimal places, 0 to 5000. `step="0.01"`. Reject non-numeric. If empty and at least one adult is working, treat as 0.
-- `numChildren`: bounded 0-8. Stepper buttons enforce. Manual entry disabled.
-- All checkboxes and radios validate by definition (have a value).
+- `adults[i].monthlyEarnings`: number to 2 decimal places, 0 to 20,000, `step="0.01"`. Empty or non-numeric is treated as 0.
+- `numAdults` (1 to 6) and `numChildren` (0 to 8): stepper buttons enforce the bounds and disable at each limit.
 - No form-level submit. Validation happens inline.
 
 ### 9.3 Conditional visibility
 
-- `adult2Age`: shown only if `numAdults == 2`.
-- `adult2Working`: shown only if `numAdults == 2`.
-- `childAges[]`: one row per child, rendered dynamically.
-- `monthlyEarnings`: shown only if `adult1Working` or `adult2Working` is true.
-- `lcwraPre2026`: shown only if `lcwra` is true.
-- `disabledChild`: shown only if `numChildren > 0`.
-- `disabledChildHigher`: shown only if `disabledChild` is true.
-- `schoolUniform` row: shown only if at least one child is in the 5 to 15 bracket.
+- `inCouple`: shown only if `numAdults` is 2 or more.
+- `adults[i].monthlyEarnings`: shown only if that adult is working. The value is kept in state if the adult stops working, but not used.
+- `childAges[]`: one row per child.
+- Any basket row whose value is £0 is hidden (in practice, school uniform when there are no children aged 5 to 15).
+- Benefit cap note: shown only when the cap applies (§7.4).
 
 ### 9.4 Keyboard and tab order
 
@@ -388,14 +347,15 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 
 | Scenario | Behaviour |
 |---|---|
-| `numAdults = 1`, `numChildren = 0`, all defaults | Single 25+ scenario. Income £98.05/week, basket roughly £119/week, shortfall ~£21/week. |
-| User unticks every basket item | Total essentials = £0. Surplus equals income. Subtext changes to: "You haven't selected any essentials. Try ticking the items you actually need each week." |
-| `monthlyEarnings` very high (e.g. £4,000) | Taper reduces UC to zero. Income = earnings ÷ 4.33 (weekly). Surplus likely large. Calculator handles correctly without breaking. |
-| `numChildren = 8`, all under 5 | Edge of UI but mathematically valid. Render 8 child rows. Calculation runs normally. |
-| User switches `numAdults` from 2 to 1 | Adult 2 inputs hide; adult 2 contributions to all formulas drop. |
-| User switches both working flags off after entering earnings | Earnings field hides. `monthlyEarnings` retained in state but not used. If user re-ticks either, value reappears. |
-| All children removed | School uniform row hides. Disabled child checkbox hides. |
-| Income is exactly equal to essentials | Display £0.00 with the "Exactly enough" copy in 7.2. |
+| 1 adult 25+, no children, all defaults | Income £98.05/week, essentials £117.46/week, shortfall £19.41/week. |
+| User unticks every basket item | Essentials = £0. Difference equals income, with the "You haven't selected any essentials" subtext. |
+| Very high earnings (e.g. £4,000/month) | Taper reduces UC to zero. Income = earnings × 12 ÷ 52. |
+| `numChildren = 8`, all under 5 | Eight child rows. Calculation runs normally. The benefit cap applies unless earnings reach the threshold. |
+| `numAdults` drops from 2 to 1 | Last adult row removed; `inCouple` cleared. |
+| Adult stops working after entering earnings | Earnings field hides. Value kept in state but not used. Reappears if re-ticked. |
+| All children removed | School uniform row hides. |
+| Income exactly equals essentials | £0.00 with the "Exactly enough" copy in §7.2. |
+| Benefit cap applies | Income reflects the capped UC; the cap note appears (§7.4). |
 
 ---
 
@@ -418,10 +378,21 @@ A slim "Start again" button sits at the bottom of the calculator. Pill-shaped (f
 ## 12. WordPress packaging
 
 - Plugin shortcode: `[uc_calculator]`. Placeable on any page or post.
-- Plugin admin page is not required for v1. All constants edited in `/inc/data.js` (or equivalent).
+- Admin page at Settings → UC Calculator. Saved values are stored in the `uc_calc_settings` option and merged over `uc_calc_defaults()`.
+- Default rates and costs live in `uc_calc_defaults()` (`uc-calc.php`) and `src/data.js`. After editing `src/` run `npm run build` to regenerate `assets/uc-calc.js`.
+- Updates come from GitHub releases through `inc/updater.php`, using the `update_plugins_github.com` hook that WordPress core fires for plugins with an `Update URI` header. Update checks work in wp-admin, WP-Cron (so automatic updates can be switched on) and WP-CLI. The latest release is cached for 12 hours; "Check again" on Dashboard → Updates bypasses the cache.
+- Release archives contain only runtime files (`uc-calc.php`, `uninstall.php`, `inc/`, `assets/`, `LICENSE`). `.gitattributes` excludes the rest.
+- Uninstalling (deleting from the Plugins screen) removes the `uc_calc_settings` option and the cached release, on every site of a multisite network. Deactivating clears the cached release only.
+
+### 12.0 Releasing an update
+
+1. Set the new version in both the `Version:` header and `UC_CALC_VERSION` in `uc-calc.php`.
+2. Run `npm test` and `npm run build`, then commit, including `assets/uc-calc.js`.
+3. Push a tag such as `v1.1.0`. The Release workflow checks the version matches the tag, runs the tests, confirms the committed bundle is current, and publishes the release with a `uc-calc.zip` attached. If you drafted the release yourself first, it keeps your notes and just attaches the zip.
+4. Sites see the update within 12 hours, or straight away after "Check again".
 - Single CSS file scoped to the plugin's container class to avoid theme conflicts.
-- Single JS file, vanilla or minimal framework (no React unless the existing site already uses it).
-- Translation-ready: wrap all visible strings in `__()` or equivalent.
+- Single JS file, vanilla, bundled with esbuild.
+- Translation-ready: all visible strings wrapped in `__()` or equivalent.
 - No GDPR notice required because no data is collected.
 
 ### 12.1 Brand palette
@@ -447,42 +418,52 @@ Use existing NBSGF brand fonts where the theme already loads them (Switzer for b
 
 ## 13. Test scenarios for QA
 
-| # | Household | Expected income | Notes |
-|---|---|---|---|
-| 1 | Single 25+, no work, no disability | £98.05/week | Headline campaign figure. Basket ~£119, shortfall ~£21. |
-| 2 | Single under 25, no work | £78.13/week | Bigger gap. |
-| 3 | Couple 25+, 0 children, no work | £153.92/week | |
-| 4 | Single parent 25+, 1 child age 5-15 | £168.19/week | |
-| 5 | Couple 25+, 2 children (1 under 5, 1 in 5-15) | £294.20/week | Largest UC scenario among childed cases. |
-| 6 | As (1) but with LCWRA new claimant | £148.19/week | +£217.26/month. |
-| 7 | As (1) but with LCWRA pre-April-2026 | £197.24/week | +£429.80/month. Demonstrates the gap between old and new claimants. |
-| 8 | As (1) but is a carer | £146.36/week | +£209.34/month. |
-| 9a | Single 25+, working £1,200/month net (no children, no LCWRA) | £276.92/week | No work allowance applies. Taper: £1,200 × 0.55 = £660 reduction. UC reduced to £0. Income = earnings only. Powerful campaign point: someone earning below NLW gets zero UC if childless and non-disabled. |
-| 9b | Single parent 25+, 1 child 5-15, working £1,200/month net | £382.93/week | Work allowance £710 applies. Excess £490 × 0.55 = £269.50 reduction. Net UC = £728.84 - £269.50 = £459.34. Income = £459.34 + £1,200 = £1,659.34/month. |
-| 9c | Couple 25+, both working, total £1,500/month net, no children, no LCWRA | weekly equivalent of (max(0, 666.97 - (1500 × 0.55)) + 1500) | Validates the no-work-allowance branch for couples. UC will reduce to £0; income equals earnings. |
-| 10 | All basket items unticked | Surplus = income | Validates the empty-basket message. |
+All with every basket item ticked. Income and essentials per week.
+
+| # | Household | Income | Essentials | Difference | Notes |
+|---|---|---|---|---|---|
+| 1 | Single 25+, no work | £98.05 | £117.46 | Shortfall £19.41 | Headline campaign figure. |
+| 2 | Single under 25, no work | £78.13 | £117.46 | Shortfall £39.33 | |
+| 3 | Couple 25+, no children, no work | £153.92 | £171.46 | Shortfall £17.54 | |
+| 4 | Single parent 25+, 1 child 5 to 15, no work | £168.19 | £171.46 | Shortfall £3.27 | |
+| 5 | Couple 25+, 2 children (1 under 5, 1 aged 5 to 15), no work | £294.20 | £248.46 | £45.74 left | |
+| 6 | Two adults 25+, not a couple, no work | £196.11 | £171.46 | £24.65 left | Each adult is a separate single claimant. |
+| 7 | Single 25+, working, £1,200/month | £276.92 | £129.46 | £147.46 left | No work allowance without children. £1,200 × 0.55 = £660 exceeds £424.90, so UC is £0. |
+| 8 | Single parent 25+, 1 child 5 to 15, working, £1,200/month | £382.92 | £183.46 | £199.46 left | Work allowance £710. Excess £490 × 0.55 = £269.50. UC = £728.84 − £269.50 = £459.34. |
+| 9 | Couple 25+, both working, £750/month each, no children | £346.15 | £195.46 | £150.69 left | No work allowance. £1,500 × 0.55 = £825 exceeds £666.97, so UC is £0. |
+| 10 | Couple 25+, 3 children 5 to 15, no work | £360.61 | £309.46 | £51.15 left | Capped. Max UC £1,578.79; limit £1,835 − Child Benefit £272.35 = £1,562.65. |
+| 11 | Single parent 25+, 4 children 5 to 15, no work | £342.71 | £309.46 | £33.25 left | Capped. Max UC £1,640.66; limit £1,835 − Child Benefit £349.92 = £1,485.08. |
+| 12 | As 10, but one adult working, £881/month | £545.94 | £321.46 | £224.48 left | Earnings at the threshold, so the cap does not apply. |
+| 13 | All basket items unticked | Income unchanged | £0.00 | Equals income | Empty-basket message. |
+
+The automated tests in `tests/` cover these calculations.
 
 ---
 
-## 14. Out of scope for v1
+## 14. Out of scope
 
 - Saving or sharing a result.
-- Multiple working adults with separate earnings.
+- LCWRA element, carer element, disabled child addition.
 - Childcare element of UC.
 - Housing element of UC and LHA shortfall.
 - Council Tax Reduction.
-- PIP, DLA for adults, Carer's Allowance.
-- Benefit cap.
+- PIP, DLA, Carer's Allowance, and Child Benefit as income.
+- London benefit cap rates, the benefit cap grace period, and exemptions for disability and carer benefits.
 - Pre-April-2017 first-child rate.
-- Comparison to MIS or destitution thresholds (beyond the bottom note).
+- Deductions from UC.
+- Deducting free school meals, the Warm Home Discount or Healthy Start from the basket.
+- Comparison to MIS or destitution thresholds (beyond the footer).
 - Animation / charts.
 
 ---
 
-## 15. Confirmed and resolved before build
+## 15. Decisions
 
 - Brand palette: see §12.1.
-- Bottom note copy: see §8 (final).
+- Footer copy: see §8.
 - Start again control: slim dark green pill, smaller uppercase white text. See §9.5.
-- Children cap: 8.
+- Caps: 6 adults, 8 children.
+- Benefit cap: modelled for outside London, with Child Benefit counted towards it.
+- Other help that lowers costs is mentioned in the footer, not deducted, so the basket stays the gross cost of essentials.
+- Costs stay on an April basis between annual reviews.
 - JavaScript-disabled fallback: a static paragraph stating the headline figure (£98.05/week for a single adult, April 2026) and a link to Trussell's Guarantee Our Essentials page.

@@ -1,0 +1,17 @@
+# Files excluded from release archives (GitHub zipballs and `git archive`),
+# so WordPress installs only what the plugin needs at runtime.
+/.claude            export-ignore
+/.github            export-ignore
+/reports            export-ignore
+/src                export-ignore
+/tests              export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore
+/build.js           export-ignore
+/jest.config.js     export-ignore
+/package.json       export-ignore
+/package-lock.json  export-ignore
+/uc-calculator-spec.md export-ignore
+/docs               export-ignore
+/README.md          export-ignore
+/CLAUDE.md          export-ignore

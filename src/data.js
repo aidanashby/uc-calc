@@ -9,8 +9,19 @@ const UC_RATES = {
     coupleAny25Plus:   666.97,
   },
   childElement:            303.94,
-  workAllowanceNoHousing:  673,
+  workAllowanceNoHousing:  710,
   taperRate:               0.55,
+  // Benefit cap outside London, monthly. Exempt if take-home earnings reach the threshold.
+  benefitCap: {
+    family:            1835,
+    single:            1229.42,
+    earningsThreshold: 881,
+  },
+  // Child Benefit, weekly. Not counted as income, but counts towards the benefit cap.
+  childBenefit: {
+    eldest:     27.05,
+    additional: 17.90,
+  },
 };
 
 const COSTS = {
