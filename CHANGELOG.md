@@ -2,6 +2,17 @@
 
 All notable changes to UC Calculator. Dates are release dates.
 
+## [1.3.1] - 2026-09-28
+
+### Changed
+- Updates now come through the bundled Plugin Update Checker library instead of the plugin's own updater. Updates appear in the same places as before.
+
+### Added
+- Plugin icon on the Plugins and Updates screens.
+
+### Fixed
+- Uninstall now also removes the update checker's stored data.
+
 ## [1.3.0] - 2026-09-23
 
 ### Changed
