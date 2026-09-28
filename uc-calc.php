@@ -398,10 +398,15 @@ function uc_calc_init_updater() {
 	if ( ! defined( 'UC_CALC_GITHUB_REPO' ) || '' === UC_CALC_GITHUB_REPO ) {
 		return;
 	}
-	require_once UC_CALC_DIR . 'inc/updater.php';
-	new UC_Calc_Updater( UC_CALC_FILE, UC_CALC_GITHUB_REPO, UC_CALC_VERSION );
+	require_once UC_CALC_DIR . 'plugin-update-checker/plugin-update-checker.php';
+	$checker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+		'https://github.com/' . UC_CALC_GITHUB_REPO . '/',
+		UC_CALC_FILE,
+		'uc-calc'
+	);
+	$checker->getVcsApi()->enableReleaseAssets();
 }
-add_action( 'init', 'uc_calc_init_updater' );
+add_action( 'plugins_loaded', 'uc_calc_init_updater' );
 
 /**
  * Clears the cached GitHub release on deactivation so a reactivated plugin

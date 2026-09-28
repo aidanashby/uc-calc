@@ -74,7 +74,7 @@ npm run watch    # Rebuilds on change
 | `uc-calc.php` | Plugin bootstrap, default rates and costs, script data, shortcode, admin menu |
 | `inc/shortcode.php` | Calculator markup and all visible copy |
 | `inc/settings.php` | Settings page |
-| `inc/updater.php` | GitHub release updater |
+| `plugin-update-checker/` | Bundled Plugin Update Checker library (GitHub release updates) |
 | `uninstall.php` | Clean-up on delete |
 | `src/` | Calculator source (bundled into `assets/uc-calc.js`) |
 | `src/data.js` | Default rates and costs for the JavaScript fallback and tests. Keep in step with `uc_calc_defaults()` |

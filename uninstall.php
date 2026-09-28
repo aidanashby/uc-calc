@@ -17,6 +17,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 function uc_calc_uninstall_site() {
 	delete_option( 'uc_calc_settings' );
 	delete_transient( 'uc_calc_github_release' );
+	delete_site_option( 'external_updates-uc-calc' );
+	wp_clear_scheduled_hook( 'puc_cron_check_updates-uc-calc' );
 }
 
 if ( is_multisite() ) {

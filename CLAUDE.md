@@ -25,7 +25,7 @@ WordPress plugin (`[uc_calculator]` shortcode) comparing Universal Credit income
 - Version is set in two places in `uc-calc.php`: the `Version:` header and `UC_CALC_VERSION`. Add a `## [x.y.z] - date` section to `CHANGELOG.md`; the release workflow uses it as the release notes. Only release when the maintainer asks.
 - Pushing a `v*` tag runs `.github/workflows/release.yml`, which verifies and attaches `uc-calc.zip`.
 - Repository rulesets: `main` blocks force-pushes and deletion; `v*` tags can only be created, moved or deleted by repo admins.
-- `inc/updater.php` reads GitHub releases via core's `update_plugins_github.com` hook. `.gitattributes` keeps dev files out of release zips.
+- Updates come from GitHub releases via the bundled Plugin Update Checker library (`plugin-update-checker/`, wired in `uc_calc_init_updater()`). Update icons are `assets/icon-128x128.png` and `assets/icon-256x256.png`. `.gitattributes` keeps dev files out of release zips.
 
 ## Monitoring
 
