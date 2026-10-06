@@ -31,3 +31,9 @@ WordPress plugin (`[uc_calculator]` shortcode) comparing Universal Credit income
 
 - A scheduled Claude Code routine ("UC Calculator monitoring") follows `.claude/routines/uc-monitor.md` and writes reports to `reports/uc-updates/`. Reports are recommendations; apply them by hand.
 - Outstanding setup tasks for the maintainer are in `docs/to-do.md` (delete when done).
+
+## Pushing
+
+- Only push when the user asks. Never push on your own initiative.
+- Push to `main` by default. Use a branch or a pull request only when the user explicitly asks for one. Never choose either yourself.
+- A `v*` tag push starts a release, so only push a tag when the user asks for the release.
