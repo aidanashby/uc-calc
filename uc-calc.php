@@ -9,7 +9,6 @@
  * License:           MIT
  * License URI:       https://opensource.org/licenses/MIT
  * Text Domain:       uc-calc
- * Domain Path:       /languages
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Update URI:        https://github.com/aidanashby/uc-calc
@@ -237,10 +236,13 @@ function uc_calc_i18n_strings() {
 		'earningsLabelSelf'  => __( 'Your monthly take-home pay', 'uc-calc' ),
 		'earningsLabelOther' => __( 'Monthly take-home pay', 'uc-calc' ),
 		'earningsHint'       => __( 'Net (take-home) pay after tax and National Insurance.', 'uc-calc' ),
+		/* translators: %s: ordinal position of the child, e.g. first. */
 		'childAgeLegend'     => __( 'How old is your %s child?', 'uc-calc' ),
 		'childAgeUnder5'     => __( 'Under 5', 'uc-calc' ),
 		'childAge5to15'      => __( '5 to 15', 'uc-calc' ),
+		/* translators: %1$s: basket item name, %2$s: weekly cost. */
 		'basketAriaIncluded' => __( '%1$s, %2$s per week', 'uc-calc' ),
+		/* translators: %1$s: basket item name, %2$s: weekly cost. */
 		'basketAriaExcluded' => __( '%1$s, %2$s per week, excluded', 'uc-calc' ),
 		/* translators: %s: monthly earnings threshold, e.g. £881.00. */
 		'benefitCapNote'     => __( 'The benefit cap has lowered the UC shown here. The cap doesn’t apply if your household takes home at least %s a month from work, or if someone gets certain disability or carer benefits.', 'uc-calc' ),
@@ -336,20 +338,6 @@ function uc_calc_shortcode() {
 }
 add_shortcode( 'uc_calculator', 'uc_calc_shortcode' );
 
-// ─── Text domain ──────────────────────────────────────────────────────────────
-
-/**
- * Loads the plugin's translations.
- */
-function uc_calc_load_textdomain() {
-	load_plugin_textdomain(
-		'uc-calc',
-		false,
-		dirname( plugin_basename( __FILE__ ) ) . '/languages'
-	);
-}
-add_action( 'init', 'uc_calc_load_textdomain' );
-
 // ─── Admin: settings page + plugin row links ─────────────────────────────────
 
 /**
@@ -407,12 +395,3 @@ function uc_calc_init_updater() {
 	$checker->getVcsApi()->enableReleaseAssets();
 }
 add_action( 'plugins_loaded', 'uc_calc_init_updater' );
-
-/**
- * Clears the cached GitHub release on deactivation so a reactivated plugin
- * checks afresh.
- */
-function uc_calc_deactivate() {
-	delete_transient( 'uc_calc_github_release' );
-}
-register_deactivation_hook( __FILE__, 'uc_calc_deactivate' );

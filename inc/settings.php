@@ -15,7 +15,7 @@ if ( ! current_user_can( 'manage_options' ) ) {
 $defaults = uc_calc_defaults();
 $notice   = '';
 
-if ( 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
 	check_admin_referer( 'uc_calc_settings_save', 'uc_calc_nonce' );
 
 	if ( isset( $_POST['uc_calc_reset'] ) ) {
@@ -156,7 +156,9 @@ function uc_calc_setting_row( $label, $group, $key, $value, $hint = '' ) {
 			<?php
 			foreach ( range( 1, 8 ) as $n ) {
 				$label = ( 8 === $n )
+					/* translators: %d: household size (always 8 for the max bracket). */
 					? sprintf( __( '%d people (max)', 'uc-calc' ), $n )
+					/* translators: %d: household size (1–7). */
 					: sprintf( _n( '%d person', '%d people', $n, 'uc-calc' ), $n );
 				uc_calc_setting_row( $label, 'costs', "water_{$n}", $s['costs'][ "water_{$n}" ] );
 			}
