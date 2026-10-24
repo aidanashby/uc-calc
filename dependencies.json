@@ -1,0 +1,23 @@
+{
+  "dependencies": [
+    {
+      "name": "Node.js",
+      "check": { "run": "node --version" },
+      "install": "winget install --id OpenJS.NodeJS.LTS -e --accept-package-agreements --accept-source-agreements"
+    },
+    {
+      "name": "PHP",
+      "purpose": "php -l syntax checks",
+      "optional": true,
+      "check": { "run": "php -v" },
+      "install": "winget install --id PHP.PHP.8.3 -e --accept-package-agreements --accept-source-agreements"
+    },
+    {
+      "name": "npm packages",
+      "purpose": "esbuild and Jest, to build and test the calculator",
+      "perRepo": true,
+      "check": { "path": "node_modules" },
+      "install": "npm ci"
+    }
+  ]
+}
