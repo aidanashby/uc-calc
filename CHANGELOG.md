@@ -2,6 +2,12 @@
 
 All notable changes to UC Calculator. Dates are release dates.
 
+## [1.3.2] - 2026-11-21
+
+### Fixed
+- Going from two adults to one and back to two no longer shows "living as a couple" ticked while the result is worked out for single people. The box is now unticked when the second adult is removed.
+- After a reload or the browser's Back button, ticked boxes now match the result. The browser could restore a ticked box that the calculation did not know about.
+
 ## [1.3.1] - 2026-09-28
 
 ### Changed

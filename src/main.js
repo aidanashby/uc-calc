@@ -371,7 +371,7 @@ function render(s) {
   updateBenefitCapNote(uc.capped);
 }
 
-// ─── Sync DOM → State (used on reset) ────────────────────────────────────────
+// ─── Sync State → DOM (on load and reset) ────────────────────────────────────
 
 function syncDOMFromState(s) {
   const coupleEl = document.getElementById('inCouple');
@@ -435,7 +435,12 @@ function handleStepperClick(id) {
     state.adults.push({ age: '25plus', working: false, monthlyEarnings: 0 });
   } else if (id === 'adults-decrease' && state.adults.length > 1) {
     state.adults.pop();
-    if (state.adults.length < 2) state.inCouple = false;
+    if (state.adults.length < 2) {
+      // Untick the (now hidden) box too, or adding an adult back shows it ticked while the sums treat them as single.
+      state.inCouple = false;
+      const coupleEl = document.getElementById('inCouple');
+      if (coupleEl) coupleEl.checked = false;
+    }
   } else if (id === 'children-increase' && state.numChildren < MAX_CHILDREN) {
     state.numChildren++;
     state.childAges.push('5to15');
@@ -559,6 +564,8 @@ function init() {
 
   if (resetBtn) resetBtn.addEventListener('click', handleReset);
 
+  // A browser can restore ticked boxes on reload or Back; the sums start from the default state, so the boxes must too.
+  syncDOMFromState(state);
   render(state);
 }
 
